@@ -1,69 +1,120 @@
 /**
- * dashboard.js — Pagina home: statistiche generali della dispensa
+ * dashboard.js — Home: statistiche, ingredienti, scadenze, anteprima ricette
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
     const user = await requireLogin();
     if (!user) return;
 
-    // Popola il nome utente
+    // Popola il nome utente nella sidebar
     const usernameEl = document.getElementById('sidebar-username');
     if (usernameEl) usernameEl.textContent = user.username;
     const avatarEl = document.getElementById('sidebar-avatar');
     if (avatarEl) avatarEl.textContent = user.username[0].toUpperCase();
 
-    document.getElementById('welcome-name').textContent = user.username;
+    // Mostra il nome di benvenuto e la data corrente
+    const welcomeEl = document.getElementById('welcome-name');
+    if (welcomeEl) welcomeEl.textContent = user.username;
+
+    const dateEl = document.getElementById('dashboard-date');
+    if (dateEl) {
+        dateEl.textContent = new Date().toLocaleDateString('it-IT', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+        });
+    }
 
     initSidebar();
     initLogout();
-    await loadDashboard();
+
+    // Carica dispensa e ricette in parallelo
+    const [pantryRes] = await Promise.all([
+        api.get('/pantry/list.php'),
+        loadRecipesPreview()
+    ]);
+
+    if (pantryRes.success) {
+        renderStats(pantryRes.stats);
+        renderIngredients(pantryRes.items);
+        renderExpiringList(pantryRes.items);
+    } else {
+        showToast('Errore nel caricamento della dispensa', 'error');
+        hideLoader('ingredients-loading');
+        hideLoader('expiring-loading');
+    }
 });
 
-/** Carica dati per la dashboard */
-async function loadDashboard() {
-    try {
-        const [userRes, pantryRes] = await Promise.all([
-            api.get('/auth/me.php'),
-            api.get('/pantry/list.php')
-        ]);
+/** Aggiorna i contatori statistici */
+function renderStats(stats) {
+    setEl('stat-total',    stats.total    ?? 0);
+    setEl('stat-ok',       stats.ok       ?? 0);
+    setEl('stat-expiring', stats.expiring ?? 0);
+    setEl('stat-expired',  stats.expired  ?? 0);
+}
 
-        if (userRes.success) {
-            renderStats(userRes.user.stats, pantryRes.success ? pantryRes.stats : null);
-        }
+/** Renderizza i chip degli ingredienti presenti in dispensa */
+function renderIngredients(items) {
+    hideLoader('ingredients-loading');
+    const wrap = document.getElementById('ingredients-wrap');
+    if (!wrap) return;
 
-        if (pantryRes.success) {
-            renderExpiringList(pantryRes.items);
-        }
-    } catch {
-        showToast('Errore nel caricamento dei dati', 'error');
+    wrap.style.display = 'block';
+
+    if (items.length === 0) {
+        wrap.innerHTML = `
+            <div class="empty-state" style="padding: 1rem 0;">
+                <div class="empty-icon" style="font-size: 2rem;">📦</div>
+                <p>La dispensa è vuota.</p>
+                <a href="pantry.html" class="btn btn-primary btn-sm" style="margin-top:0.5rem;">Aggiungi prodotti</a>
+            </div>`;
+        return;
+    }
+
+    const VISIBLE = 20; // Chip mostrati prima di "Mostra tutti"
+    const chipsEl = document.getElementById('ingredients-chips');
+    const moreBtn = document.getElementById('btn-more-chips');
+    if (!chipsEl) return;
+
+    // Costruisce i chip in base allo stato di scadenza
+    chipsEl.innerHTML = items.map(item => {
+        const cls = item.expiry_status === 'expired'  ? 'ingredient-chip expired'
+                  : item.expiry_status === 'expiring' ? 'ingredient-chip expiring'
+                  : 'ingredient-chip';
+        const icon = item.expiry_status === 'expired'  ? '❌'
+                   : item.expiry_status === 'expiring' ? '⚠️'
+                   : '✓';
+        return `<span class="${cls}" title="${escapeHtml(item.brand ?? '')}">
+                    <span>${icon}</span>
+                    ${escapeHtml(item.name)}
+                    <small style="opacity:0.7">${item.quantity} ${escapeHtml(item.unit)}</small>
+                </span>`;
+    }).join('');
+
+    // Bottone "Mostra tutti" se i chip superano il limite visivo
+    if (items.length > VISIBLE && moreBtn) {
+        moreBtn.style.display = 'inline-block';
+        moreBtn.addEventListener('click', () => {
+            chipsEl.classList.add('expanded');
+            moreBtn.style.display = 'none';
+        });
     }
 }
 
-/** Renderizza le statistiche */
-function renderStats(userStats, pantryStats) {
-    const stats = pantryStats ?? userStats;
-
-    setEl('stat-total',    stats.total    ?? 0);
-    setEl('stat-expiring', stats.expiring ?? 0);
-    setEl('stat-expired',  stats.expired  ?? 0);
-    setEl('stat-ok',       stats.ok       ?? 0);
-}
-
-/** Renderizza la lista prodotti in scadenza nella dashboard */
+/** Renderizza la lista prodotti in scadenza/scaduti */
 function renderExpiringList(items) {
+    hideLoader('expiring-loading');
     const list = document.getElementById('expiring-list');
     if (!list) return;
 
-    // Filtra solo i prodotti in scadenza o scaduti con data
+    // Prendi scaduti + in scadenza, max 7 elementi
     const critical = items
         .filter(i => i.expiry_status === 'expired' || i.expiry_status === 'expiring')
-        .slice(0, 8);
+        .slice(0, 7);
 
     if (critical.length === 0) {
         list.innerHTML = `
-            <div class="empty-state" style="padding: 2rem;">
-                <div class="empty-icon" style="font-size: 2rem;">✅</div>
-                <p>Nessun prodotto in scadenza imminente.</p>
+            <div style="text-align:center; padding: 1.5rem 0; color: var(--text-light);">
+                <div style="font-size:2rem;">✅</div>
+                <p style="font-size:0.88rem; margin-top:0.5rem;">Nessun prodotto in scadenza imminente.</p>
             </div>`;
         return;
     }
@@ -71,24 +122,96 @@ function renderExpiringList(items) {
     list.innerHTML = critical.map(item => {
         const badge = item.expiry_status === 'expired'
             ? `<span class="badge badge-expired">Scaduto</span>`
-            : `<span class="badge badge-expiring">Scade in ${item.days_to_expiry} giorni</span>`;
+            : `<span class="badge badge-expiring">${item.days_to_expiry}gg</span>`;
+
+        const emoji = item.expiry_status === 'expired' ? '❌' : '⚠️';
 
         return `
-            <div style="display: flex; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-light); gap: 0.75rem;">
-                <span style="font-size: 1.5rem;">🥫</span>
-                <div style="flex: 1;">
-                    <div style="font-weight: 600; font-size: 0.9rem;">${escapeHtml(item.name)}</div>
-                    <div style="font-size: 0.8rem; color: var(--text-light);">${formatDate(item.expiry_date)}</div>
+            <div class="expiry-row">
+                <span class="expiry-emoji">${emoji}</span>
+                <div class="expiry-info">
+                    <div class="expiry-name">${escapeHtml(item.name)}</div>
+                    <div class="expiry-date">${formatDate(item.expiry_date)} · ${item.quantity} ${escapeHtml(item.unit)}</div>
                 </div>
-                ${badge}
+                <div class="expiry-badge">${badge}</div>
             </div>`;
     }).join('');
 }
 
-/** Renderizza ultimi prodotti aggiunti */
+/** Carica e renderizza le prime ricette suggerite (anteprima) */
+async function loadRecipesPreview() {
+    try {
+        const res = await api.get('/recipes/suggest.php?number=4');
+
+        hideLoader('recipes-loading');
+        const preview = document.getElementById('recipes-preview');
+        const moreDiv = document.getElementById('recipes-preview-more');
+        if (!preview) return;
+
+        if (!res.success || !res.recipes?.length) {
+            preview.innerHTML = `
+                <div style="text-align:center; padding:1rem 0; color:var(--text-light);">
+                    <div style="font-size:2rem;">🍽️</div>
+                    <p style="font-size:0.88rem; margin-top:0.5rem;">
+                        ${res.message || 'Aggiungi prodotti per ricevere ricette.'}
+                    </p>
+                </div>`;
+            return;
+        }
+
+        preview.innerHTML = res.recipes.slice(0, 4).map(recipe => {
+            const compatClass = recipe.compatibility >= 80 ? 'badge-green'
+                              : recipe.compatibility >= 50 ? 'badge-expiring'
+                              : 'badge-expired';
+
+            const imgHtml = recipe.image
+                ? `<img class="recipe-mini-img" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.title)}" loading="lazy" onerror="this.style.display='none'">`
+                : `<div class="recipe-mini-placeholder">🍽️</div>`;
+
+            const canMake = recipe.can_make_now
+                ? `<span class="badge badge-green" style="font-size:0.7rem;">✓ Subito</span>`
+                : '';
+
+            return `
+                <div class="recipe-mini">
+                    ${imgHtml}
+                    <div class="recipe-mini-info">
+                        <div class="recipe-mini-title">${escapeHtml(recipe.title)}</div>
+                        <div class="recipe-mini-meta">
+                            <span class="badge ${compatClass}" style="font-size:0.7rem;">${recipe.compatibility}% compat.</span>
+                            ${canMake}
+                            <span style="font-size:0.75rem; color:var(--text-light);">
+                                🔴 ${recipe.missed_ingredient_count} mancanti
+                            </span>
+                        </div>
+                    </div>
+                </div>`;
+        }).join('');
+
+        // Mostra il bottone "Vedi tutte" se ci sono più di 4 ricette
+        if (res.total_found > 4 && moreDiv) {
+            moreDiv.style.display = 'block';
+        }
+    } catch {
+        hideLoader('recipes-loading');
+        const preview = document.getElementById('recipes-preview');
+        if (preview) {
+            preview.innerHTML = `<p style="color:var(--text-light); font-size:0.88rem; text-align:center; padding:1rem 0;">
+                Impossibile caricare le ricette.</p>`;
+        }
+    }
+}
+
+// ---- Utility ----
+
 function setEl(id, value) {
     const el = document.getElementById(id);
     if (el) el.textContent = value;
+}
+
+function hideLoader(id) {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
 }
 
 function initLogout() {

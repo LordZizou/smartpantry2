@@ -3,16 +3,115 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Pantry — Ricette consigliate</title>
+    <title>Smart Pantry — Ricette</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
         .border-success { border-top: 3px solid var(--success); }
         #recipes-stats  { display: none; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+
+        /* ---- Tab ricette ---- */
+        .recipes-tabs {
+            display: flex;
+            background: var(--white);
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            padding: 4px;
+            gap: 4px;
+            margin-bottom: 1.25rem;
+            width: fit-content;
+        }
+        .recipes-tab {
+            padding: 0.55rem 1.25rem;
+            background: transparent;
+            border: none;
+            border-radius: calc(var(--radius) - 2px);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .recipes-tab.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+        .recipes-tab:not(.active):hover { color: var(--primary); }
+
+        /* ---- Barra di ricerca ricette ---- */
+        .recipe-search-bar {
+            display: flex;
+            gap: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+        .recipe-search-bar .search-input-wrap {
+            flex: 1;
+            position: relative;
+        }
+        .recipe-search-bar .search-input-wrap input {
+            padding-left: 2.6rem;
+            font-size: 1rem;
+        }
+        .recipe-search-bar .search-input-wrap .search-icon {
+            left: 0.9rem;
+            font-size: 1.1rem;
+        }
+
+        /* ---- Risultati ricerca: info ---- */
+        .search-info {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            margin-bottom: 1rem;
+            font-size: 0.88rem;
+            color: var(--text-light);
+        }
+        .search-info strong { color: var(--text); }
+
+        /* ---- Skeleton loader ---- */
+        .recipe-skeleton {
+            background: var(--white);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+        }
+        .skeleton-img {
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(90deg, var(--border-light) 25%, #e8e8e8 50%, var(--border-light) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+        }
+        .skeleton-body { padding: 1rem; }
+        .skeleton-line {
+            height: 14px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--border-light) 25%, #e8e8e8 50%, var(--border-light) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.4s infinite;
+            margin-bottom: 0.6rem;
+        }
+        .skeleton-line.short { width: 60%; }
+        @keyframes shimmer {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Minuti cottura badge */
+        .time-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.78rem;
+            color: var(--text-light);
+        }
     </style>
 </head>
 <body>
 
-<!-- Overlay mobile sidebar -->
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <div class="app-layout">
@@ -22,27 +121,17 @@
             <span class="logo-icon">🥦</span>
             <h2>Smart Pantry</h2>
         </div>
-
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item">
-                <span class="nav-icon">🏠</span> Dashboard
-            </a>
-            <a href="pantry.html" class="nav-item">
-                <span class="nav-icon">📦</span> La mia dispensa
-            </a>
-            <a href="scanner.html" class="nav-item">
-                <span class="nav-icon">📷</span> Scanner barcode
-            </a>
-            <a href="recipes.html" class="nav-item active">
-                <span class="nav-icon">🍽️</span> Ricette consigliate
-            </a>
+            <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+            <a href="pantry.html"    class="nav-item"><span class="nav-icon">📦</span> La mia dispensa</a>
+            <a href="scanner.html"   class="nav-item"><span class="nav-icon">📷</span> Scanner barcode</a>
+            <a href="recipes.html"   class="nav-item active"><span class="nav-icon">🍽️</span> Ricette</a>
         </nav>
-
         <div class="sidebar-footer">
             <div class="sidebar-user">
                 <div class="user-avatar" id="sidebar-avatar">U</div>
                 <div class="user-info">
-                    <div class="user-name" id="sidebar-username">Utente</div>
+                    <div class="user-name"  id="sidebar-username">Utente</div>
                     <div class="user-email">Smart Pantry</div>
                 </div>
             </div>
@@ -50,49 +139,109 @@
         </div>
     </aside>
 
-    <!-- Contenuto principale -->
     <div class="main-content">
-        <!-- Topbar -->
         <header class="topbar">
             <button class="hamburger" id="hamburger">☰</button>
-            <h1 class="topbar-title">Ricette consigliate</h1>
+            <h1 class="topbar-title">Ricette</h1>
             <div class="topbar-actions">
-                <button id="btn-reload" class="btn btn-outline btn-sm">🔄 Aggiorna</button>
+                <button id="btn-reload" class="btn btn-outline btn-sm" title="Ricarica">🔄 Aggiorna</button>
             </div>
         </header>
 
-        <!-- Pagina -->
         <main class="page-content">
 
-            <!-- Controlli -->
-            <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
-                <label class="toggle-label">
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="toggle-pantry-only">
-                        <span class="toggle-slider"></span>
+            <!-- Tab: Consigliate / Cerca -->
+            <div class="recipes-tabs">
+                <button class="recipes-tab active" data-tab="suggested">
+                    ✨ Consigliate per te
+                </button>
+                <button class="recipes-tab" data-tab="search">
+                    🔍 Cerca ricetta
+                </button>
+            </div>
+
+            <!-- ===== SEZIONE: RICETTE CONSIGLIATE ===== -->
+            <div id="section-suggested">
+
+                <!-- Toggle solo dispensa -->
+                <div style="display:flex; align-items:center; gap:1.5rem; margin-bottom:1.25rem; flex-wrap:wrap;">
+                    <label class="toggle-label">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="toggle-pantry-only">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Solo ingredienti in dispensa</span>
                     </label>
-                    <span>Solo ingredienti in dispensa</span>
-                </label>
-                <p style="font-size: 0.85rem; color: var(--text-light);">
-                    Le ricette vengono suggerite in base agli ingredienti presenti nella tua dispensa, ordinate per compatibilità.
-                </p>
-            </div>
-
-            <!-- Statistiche risultati -->
-            <div id="recipes-stats" class="stats-grid"></div>
-
-            <!-- Loading -->
-            <div id="recipes-loader" class="loading" style="display: none;">
-                <div class="spinner"></div>
-                <span>Ricerca ricette in corso…</span>
-            </div>
-
-            <!-- Griglia ricette -->
-            <div class="recipes-grid" id="recipes-grid">
-                <div class="loading" style="grid-column: 1/-1; padding: 3rem;">
-                    <div class="spinner"></div>
-                    <span>Caricamento ricette…</span>
+                    <p style="font-size:0.85rem; color:var(--text-light); margin:0;">
+                        Ricette ordinate per compatibilità con la tua dispensa.
+                    </p>
                 </div>
+
+                <!-- Statistiche risultati -->
+                <div id="recipes-stats" class="stats-grid"></div>
+
+                <!-- Loader skeleton -->
+                <div id="recipes-loader" style="display:none;">
+                    <div class="recipes-grid">
+                        ${[1,2,3,4,5,6].map(() => `
+                            <div class="recipe-skeleton">
+                                <div class="skeleton-img"></div>
+                                <div class="skeleton-body">
+                                    <div class="skeleton-line"></div>
+                                    <div class="skeleton-line short"></div>
+                                    <div class="skeleton-line"></div>
+                                </div>
+                            </div>`).join('')}
+                    </div>
+                </div>
+
+                <!-- Griglia ricette -->
+                <div class="recipes-grid" id="recipes-grid">
+                    <div class="loading" style="grid-column:1/-1; padding:3rem;">
+                        <div class="spinner"></div>
+                        <span>Caricamento ricette…</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SEZIONE: CERCA RICETTA ===== -->
+            <div id="section-search" style="display:none;">
+
+                <!-- Barra di ricerca -->
+                <div class="recipe-search-bar">
+                    <div class="search-input-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input class="form-control" type="text" id="search-query"
+                               placeholder="Cerca una ricetta… es. pizza, pasta al pesto, tiramisù"
+                               autocomplete="off">
+                    </div>
+                    <button id="btn-search" class="btn btn-primary">Cerca</button>
+                </div>
+
+                <!-- Suggerimenti rapidi -->
+                <div id="search-suggestions" style="margin-bottom:1.25rem;">
+                    <p style="font-size:0.82rem; color:var(--text-light); margin-bottom:0.5rem;">Cerca ad esempio:</p>
+                    <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
+                        ${['pizza','pasta','risotto','pollo','insalata','dolce','zuppa','frittata'].map(s =>
+                            `<button class="filter-btn" onclick="quickSearch('${s}')">${s}</button>`
+                        ).join('')}
+                    </div>
+                </div>
+
+                <!-- Info risultati -->
+                <div id="search-info" class="search-info" style="display:none;">
+                    Risultati per: <strong id="search-query-label"></strong>
+                    <span id="search-count"></span>
+                </div>
+
+                <!-- Loader ricerca -->
+                <div id="search-loader" class="loading" style="display:none; padding:2rem;">
+                    <div class="spinner"></div>
+                    <span>Ricerca in corso…</span>
+                </div>
+
+                <!-- Griglia risultati ricerca -->
+                <div class="recipes-grid" id="search-grid"></div>
             </div>
 
         </main>
