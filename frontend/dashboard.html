@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Pantry — Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Overlay mobile sidebar -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">🥦</span>
+            <h2>Smart Pantry</h2>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item active">
+                <span class="nav-icon">🏠</span> Dashboard
+            </a>
+            <a href="pantry.html" class="nav-item">
+                <span class="nav-icon">📦</span> La mia dispensa
+            </a>
+            <a href="scanner.html" class="nav-item">
+                <span class="nav-icon">📷</span> Scanner barcode
+            </a>
+            <a href="recipes.html" class="nav-item">
+                <span class="nav-icon">🍽️</span> Ricette consigliate
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebar-avatar">U</div>
+                <div class="user-info">
+                    <div class="user-name" id="sidebar-username">Utente</div>
+                    <div class="user-email">Smart Pantry</div>
+                </div>
+            </div>
+            <button class="btn btn-secondary btn-sm btn-full" id="btn-logout">Esci</button>
+        </div>
+    </aside>
+
+    <!-- Contenuto principale -->
+    <div class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <button class="hamburger" id="hamburger">☰</button>
+            <h1 class="topbar-title">Dashboard</h1>
+        </header>
+
+        <!-- Pagina -->
+        <main class="page-content">
+
+            <!-- Benvenuto -->
+            <div style="margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.4rem; font-weight: 700; color: var(--text);">
+                    Ciao, <span id="welcome-name">…</span>! 👋
+                </h2>
+                <p style="color: var(--text-light);">Ecco il riepilogo della tua dispensa.</p>
+            </div>
+
+            <!-- Statistiche -->
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon green">📦</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-total">—</div>
+                        <div class="stat-label">Prodotti in dispensa</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue">✅</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-ok">—</div>
+                        <div class="stat-label">Prodotti OK</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon yellow">⚠️</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-expiring">—</div>
+                        <div class="stat-label">In scadenza (7 giorni)</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">❌</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-expired">—</div>
+                        <div class="stat-label">Scaduti</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Griglia azioni rapide + lista scadenze -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+
+                <!-- Azioni rapide -->
+                <div class="card">
+                    <div class="card-header">
+                        <span>⚡</span>
+                        <span class="card-title">Azioni rapide</span>
+                    </div>
+                    <div class="card-body" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        <a href="pantry.html" class="btn btn-primary">📦 Vai alla dispensa</a>
+                        <a href="scanner.html" class="btn btn-outline">📷 Scansiona prodotto</a>
+                        <a href="recipes.html" class="btn btn-outline">🍽️ Vedi ricette consigliate</a>
+                    </div>
+                </div>
+
+                <!-- Prodotti in scadenza -->
+                <div class="card">
+                    <div class="card-header">
+                        <span>⚠️</span>
+                        <span class="card-title">Prodotti in scadenza</span>
+                        <a href="pantry.html" style="font-size: 0.82rem; color: var(--primary);">Vedi tutti →</a>
+                    </div>
+                    <div class="card-body" style="padding: 0.5rem 1.25rem;">
+                        <div id="expiring-list">
+                            <div class="loading" style="padding: 1.5rem;">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/dashboard.js"></script>
+</body>
+</html>
