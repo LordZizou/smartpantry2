@@ -5,10 +5,48 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Pantry — Scanner Barcode</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .hidden { display: none !important; }
+
+        /* Tab scanner / ricerca per nome */
+        .scanner-tabs {
+            display: flex;
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 4px;
+            gap: 4px;
+            margin-bottom: 1.25rem;
+        }
+
+        .scanner-tab {
+            flex: 1;
+            padding: 0.55rem 1rem;
+            background: transparent;
+            border: none;
+            border-radius: calc(var(--radius) - 2px);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.18s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .scanner-tab.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .scanner-tab:not(.active):hover { color: var(--primary); }
+    </style>
 </head>
 <body>
 
-<!-- Overlay mobile sidebar -->
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <div class="app-layout">
@@ -18,27 +56,17 @@
             <span class="logo-icon">🥦</span>
             <h2>Smart Pantry</h2>
         </div>
-
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item">
-                <span class="nav-icon">🏠</span> Dashboard
-            </a>
-            <a href="pantry.html" class="nav-item">
-                <span class="nav-icon">📦</span> La mia dispensa
-            </a>
-            <a href="scanner.html" class="nav-item active">
-                <span class="nav-icon">📷</span> Scanner barcode
-            </a>
-            <a href="recipes.html" class="nav-item">
-                <span class="nav-icon">🍽️</span> Ricette consigliate
-            </a>
+            <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+            <a href="pantry.html"    class="nav-item"><span class="nav-icon">📦</span> La mia dispensa</a>
+            <a href="scanner.html"   class="nav-item active"><span class="nav-icon">📷</span> Scanner</a>
+            <a href="recipes.html"   class="nav-item"><span class="nav-icon">🍽️</span> Ricette</a>
         </nav>
-
         <div class="sidebar-footer">
             <div class="sidebar-user">
                 <div class="user-avatar" id="sidebar-avatar">U</div>
                 <div class="user-info">
-                    <div class="user-name" id="sidebar-username">Utente</div>
+                    <div class="user-name"  id="sidebar-username">Utente</div>
                     <div class="user-email">Smart Pantry</div>
                 </div>
             </div>
@@ -46,91 +74,104 @@
         </div>
     </aside>
 
-    <!-- Contenuto principale -->
     <div class="main-content">
-        <!-- Topbar -->
         <header class="topbar">
             <button class="hamburger" id="hamburger">☰</button>
-            <h1 class="topbar-title">Scanner Barcode</h1>
+            <h1 class="topbar-title">Aggiungi prodotto</h1>
         </header>
 
-        <!-- Pagina -->
         <main class="page-content">
             <div class="scanner-container">
 
-                <!-- Istruzioni -->
-                <div class="alert alert-info" style="margin-bottom: 1.25rem;">
-                    <span class="alert-icon">ℹ️</span>
-                    <div>
-                        <strong>Come funziona:</strong> Avvia la fotocamera, inquadra il barcode del prodotto
-                        oppure inseriscilo manualmente. I dati vengono recuperati automaticamente da
-                        <a href="https://world.openfoodfacts.org" target="_blank">OpenFoodFacts</a>.
-                    </div>
+                <!-- Tab: Barcode / Cerca per nome -->
+                <div class="scanner-tabs">
+                    <button class="scanner-tab active" data-tab="barcode">
+                        📷 Scansiona barcode
+                    </button>
+                    <button class="scanner-tab" data-tab="name">
+                        🔍 Cerca per nome
+                    </button>
                 </div>
 
-                <!-- Scanner fotocamera -->
-                <div class="card" style="margin-bottom: 1.25rem;">
-                    <div class="card-header">
-                        <span>📷</span>
-                        <span class="card-title">Scanner fotocamera</span>
+                <!-- ===== SEZIONE BARCODE ===== -->
+                <div id="section-barcode">
+                    <div class="alert alert-info" style="margin-bottom:1rem;">
+                        <span class="alert-icon">ℹ️</span>
+                        <div>Inquadra il barcode con la fotocamera oppure inseriscilo manualmente.
+                        I dati vengono recuperati da <strong>OpenFoodFacts</strong>.</div>
                     </div>
-                    <div class="card-body">
-                        <!-- Contenitore fotocamera (html5-qrcode) -->
-                        <div id="reader" style="margin-bottom: 1rem;"></div>
 
-                        <!-- Stato scanner -->
-                        <p id="scan-status" style="color: var(--text-light); font-size: 0.9rem; margin-bottom: 1rem;"></p>
-
-                        <!-- Loading ricerca -->
-                        <div id="scan-loading" class="loading" style="display: none; padding: 1rem;">
-                            <div class="spinner"></div>
-                            <span>Ricerca prodotto in corso…</span>
+                    <div class="card" style="margin-bottom:1rem;">
+                        <div class="card-header">
+                            <span>📷</span><span class="card-title">Fotocamera</span>
                         </div>
-
-                        <!-- Bottoni controllo scanner -->
-                        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                            <button id="btn-start-scan" class="btn btn-primary">
-                                📷 Avvia fotocamera
-                            </button>
-                            <button id="btn-stop-scan" class="btn btn-secondary" style="display: none;">
-                                ⏹ Ferma fotocamera
-                            </button>
+                        <div class="card-body">
+                            <div id="reader" style="margin-bottom:1rem;"></div>
+                            <p id="scan-status" style="color:var(--text-light); font-size:0.9rem; margin-bottom:1rem;"></p>
+                            <div id="scan-loading" class="loading hidden" style="padding:1rem;">
+                                <div class="spinner"></div><span>Ricerca prodotto…</span>
+                            </div>
+                            <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                                <button id="btn-start-scan" class="btn btn-primary">📷 Avvia fotocamera</button>
+                                <button id="btn-stop-scan"  class="btn btn-secondary hidden">⏹ Ferma</button>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Input manuale barcode -->
-                <div class="card" style="margin-bottom: 1.25rem;">
-                    <div class="card-header">
-                        <span>⌨️</span>
-                        <span class="card-title">Inserimento manuale barcode</span>
-                    </div>
-                    <div class="card-body">
-                        <form id="form-manual-barcode">
-                            <div class="form-group">
-                                <label class="form-label" for="manual-barcode">Codice barcode</label>
+                    <!-- Input barcode manuale -->
+                    <div class="card" style="margin-bottom:1rem;">
+                        <div class="card-header">
+                            <span>⌨️</span><span class="card-title">Inserisci barcode manualmente</span>
+                        </div>
+                        <div class="card-body">
+                            <form id="form-manual-barcode">
                                 <div class="barcode-input-row">
                                     <input class="form-control" type="text" id="manual-barcode"
                                            placeholder="es. 8001234567890"
-                                           pattern="[0-9A-Za-z\-]{4,20}"
-                                           title="Inserisci un barcode valido (4-20 caratteri)">
+                                           pattern="[0-9A-Za-z\-]{4,20}">
                                     <button type="submit" class="btn btn-primary">🔍 Cerca</button>
                                 </div>
-                                <div class="form-hint">Codice EAN-13, EAN-8, UPC o simili</div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Risultato ricerca prodotto -->
-                <div id="result-section" style="display: none;"></div>
+                <!-- ===== SEZIONE CERCA PER NOME ===== -->
+                <div id="section-name" class="hidden">
+                    <div class="alert alert-info" style="margin-bottom:1rem;">
+                        <span class="alert-icon">ℹ️</span>
+                        <div>Cerca il prodotto per nome su <strong>OpenFoodFacts</strong>. Vengono mostrate le corrispondenze: scegli quella giusta.</div>
+                    </div>
+
+                    <div class="card" style="margin-bottom:1rem;">
+                        <div class="card-header">
+                            <span>🔍</span><span class="card-title">Cerca prodotto per nome</span>
+                        </div>
+                        <div class="card-body">
+                            <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
+                                <input class="form-control" type="text" id="name-search-input"
+                                       placeholder="es. Nutella, Latte Granarolo, Pasta Barilla…"
+                                       autocomplete="off">
+                                <button id="btn-name-search" class="btn btn-primary">Cerca</button>
+                            </div>
+
+                            <div id="name-search-loader" class="loading hidden" style="padding:1rem;">
+                                <div class="spinner"></div><span>Ricerca su OpenFoodFacts…</span>
+                            </div>
+
+                            <div id="name-search-results" class="product-search-results hidden"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ===== RISULTATO PRODOTTO (comune a barcode e nome) ===== -->
+                <div id="result-section" class="hidden"></div>
 
             </div>
         </main>
     </div>
 </div>
 
-<!-- Libreria html5-qrcode per la scansione barcode con fotocamera -->
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/api.js"></script>
 <script src="js/scanner.js"></script>

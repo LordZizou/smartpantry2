@@ -55,6 +55,7 @@ CREATE TABLE IF NOT EXISTS pantry_items (
     product_id    INT,                          -- NULL se prodotto inserito manualmente
     name          VARCHAR(255) NOT NULL,        -- nome del prodotto (duplicato per praticità)
     brand         VARCHAR(255),
+    category      VARCHAR(50),                  -- latticini, verdura, carne, ecc.
     quantity      DECIMAL(10,2) NOT NULL DEFAULT 1,
     unit          VARCHAR(20)  NOT NULL DEFAULT 'pz', -- pz, g, kg, ml, l, ecc.
     expiry_date   DATE,                         -- NULL se non applicabile
@@ -84,6 +85,11 @@ CREATE TABLE IF NOT EXISTS saved_recipes (
     UNIQUE KEY unique_user_recipe (user_id, spoonacular_id),
     INDEX idx_user_id (user_id)
 ) ENGINE=InnoDB;
+
+-- ============================================================
+-- MIGRAZIONE per database già creati (eseguire una sola volta):
+-- ALTER TABLE pantry_items ADD COLUMN category VARCHAR(50) DEFAULT NULL AFTER brand;
+-- ============================================================
 
 -- ============================================================
 -- Relazioni tra le tabelle:
