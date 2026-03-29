@@ -6,6 +6,44 @@
 // Base URL del backend — si adatta automaticamente in base all'origine
 const API_BASE = window.location.origin + '/smartpantry2/api';
 
+// ---- Definizione categorie prodotti (icona, colori, etichetta) ----
+const CATEGORIES = {
+    latticini:  { icon: '🧀', bg: '#fff8e1', border: '#ffe082', text: '#c56a00', label: 'Latticini' },
+    verdura:    { icon: '🥦', bg: '#e8f5e9', border: '#a5d6a7', text: '#2e7d32', label: 'Verdura' },
+    frutta:     { icon: '🍎', bg: '#fce4ec', border: '#f48fb1', text: '#ad1457', label: 'Frutta' },
+    carne:      { icon: '🥩', bg: '#fbe9e7', border: '#ffab91', text: '#bf360c', label: 'Carne' },
+    pesce:      { icon: '🐟', bg: '#e3f2fd', border: '#90caf9', text: '#1565c0', label: 'Pesce' },
+    cereali:    { icon: '🌾', bg: '#fff3e0', border: '#ffcc80', text: '#e65100', label: 'Cereali & Pasta' },
+    surgelati:  { icon: '🧊', bg: '#e8eaf6', border: '#9fa8da', text: '#283593', label: 'Surgelati' },
+    bevande:    { icon: '🥤', bg: '#e1f5fe', border: '#81d4fa', text: '#0277bd', label: 'Bevande' },
+    condimenti: { icon: '🧂', bg: '#f3e5f5', border: '#ce93d8', text: '#6a1b9a', label: 'Condimenti' },
+    snack:      { icon: '🍿', bg: '#fbe9e7', border: '#ef9a9a', text: '#c62828', label: 'Snack & Dolci' },
+    conserve:   { icon: '🥫', bg: '#f1f8e9', border: '#c5e1a5', text: '#33691e', label: 'Conserve' },
+    altro:      { icon: '📦', bg: '#f5f5f5', border: '#e0e0e0', text: '#546e7a', label: 'Altro' },
+};
+
+/** Restituisce i dati categoria (o 'altro' come fallback) */
+function getCategoryData(key) {
+    return CATEGORIES[key] || CATEGORIES['altro'];
+}
+
+/** Genera l'HTML del badge categoria */
+function buildCategoryBadge(category) {
+    if (!category) return '';
+    const cat = getCategoryData(category);
+    return `<span class="cat-badge cat-${category}"
+                  style="background:${cat.bg}; color:${cat.text}; border:1px solid ${cat.border};">
+                ${cat.icon} ${cat.label}
+            </span>`;
+}
+
+/** Genera le opzioni HTML per il select categoria */
+function buildCategoryOptions(selected = '') {
+    return Object.entries(CATEGORIES).map(([key, cat]) =>
+        `<option value="${key}" ${key === selected ? 'selected' : ''}>${cat.icon} ${cat.label}</option>`
+    ).join('');
+}
+
 /**
  * Effettua una chiamata API generica.
  * @param {string} endpoint — es. '/auth/login.php'

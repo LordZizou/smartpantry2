@@ -32,6 +32,7 @@ if ($body === null) {
 // Estrai e valida i campi
 $name       = trim($body['name']        ?? '');
 $brand      = trim($body['brand']       ?? '');
+$category   = trim($body['category']    ?? '');
 $quantity   = $body['quantity']         ?? 1;
 $unit       = trim($body['unit']        ?? 'pz');
 $expiryDate = trim($body['expiry_date'] ?? '');
@@ -68,20 +69,21 @@ if ($barcode !== '') {
 
 // Inserisci il prodotto nella dispensa
 $stmt = $pdo->prepare(
-    'INSERT INTO pantry_items (user_id, product_id, name, brand, quantity, unit, expiry_date, location, notes)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    'INSERT INTO pantry_items (user_id, product_id, name, brand, category, quantity, unit, expiry_date, location, notes)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
 );
 
 $stmt->execute([
     $userId,
     $productId,
     $name,
-    $brand ?: null,
+    $brand    ?: null,
+    $category ?: null,
     (float) $quantity,
     $unit,
     $expiryDate ?: null,
-    $location ?: null,
-    $notes ?: null
+    $location   ?: null,
+    $notes      ?: null
 ]);
 
 $newId = (int) $pdo->lastInsertId();

@@ -43,6 +43,7 @@ $params       = [];
 $allowedFields = [
     'name'        => 'name',
     'brand'       => 'brand',
+    'category'    => 'category',
     'quantity'    => 'quantity',
     'unit'        => 'unit',
     'expiry_date' => 'expiry_date',

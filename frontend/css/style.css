@@ -5,28 +5,39 @@
 
 /* ---------- Variabili colore e tema ---------- */
 :root {
-    --primary:        #2d8a4e;
-    --primary-dark:   #1e6038;
-    --primary-light:  #4caf72;
-    --primary-bg:     #f0f7f4;
+    /* Palette verde principale */
+    --primary:        #1f7a40;
+    --primary-dark:   #145a2c;
+    --primary-light:  #37a05e;
+    --primary-bg:     #d4eddb;
+
+    /* Sfumature di verde per i background */
+    --green-50:       #eaf6ee;   /* sfondo pagina principale */
+    --green-100:      #d4edda;   /* sfondo secondario */
+    --green-150:      #c0e3c8;   /* bordi, separatori */
+    --green-200:      #a3d4ae;   /* accenti leggeri */
+    --green-300:      #71b882;
+    --green-700:      #1a6635;
+    --green-900:      #0e3d1e;   /* sidebar scura */
 
     --accent:         #ff6b35;
-    --warning:        #ffa726;
-    --warning-bg:     #fff8e1;
-    --danger:         #ef5350;
+    --warning:        #f59800;
+    --warning-bg:     #fff3cd;
+    --danger:         #e53935;
     --danger-bg:      #ffebee;
-    --success:        #43a047;
+    --success:        #2e7d32;
     --success-bg:     #e8f5e9;
-    --info:           #1e88e5;
+    --info:           #1565c0;
     --info-bg:        #e3f2fd;
 
-    --text:           #2c3e50;
-    --text-light:     #7f8c8d;
-    --text-muted:     #b0bec5;
-    --border:         #e0e0e0;
-    --border-light:   #f5f5f5;
+    --text:           #1a2e1e;
+    --text-light:     #4a6551;
+    --text-muted:     #8aaa91;
+    --border:         #b8d9c0;
+    --border-light:   #daf0df;
     --white:          #ffffff;
-    --bg:             #f8f9fa;
+    --bg:             #eaf6ee;    /* sfondo principale verde chiaro */
+    --bg-2:           #dff2e5;    /* sfondo leggermente più scuro */
 
     --shadow-sm:      0 1px 3px rgba(0,0,0,0.08);
     --shadow:         0 2px 8px rgba(0,0,0,0.10);
@@ -163,7 +174,7 @@ input, select, textarea {
 /* ---------- Sidebar navigazione ---------- */
 .sidebar {
     width: var(--nav-width);
-    background: var(--primary-dark);
+    background: var(--green-900);
     color: var(--white);
     display: flex;
     flex-direction: column;
@@ -177,7 +188,8 @@ input, select, textarea {
 
 .sidebar-logo {
     padding: 1.5rem 1.25rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255,255,255,0.12);
+    background: rgba(0,0,0,0.15);
     display: flex;
     align-items: center;
     gap: 0.75rem;
@@ -302,8 +314,8 @@ input, select, textarea {
 
 .topbar {
     height: var(--topbar-height);
-    background: var(--white);
-    border-bottom: 1px solid var(--border);
+    background: var(--green-100);
+    border-bottom: 1px solid var(--green-150);
     display: flex;
     align-items: center;
     padding: 0 1.5rem;
@@ -441,7 +453,7 @@ input, select, textarea {
 .card {
     background: var(--white);
     border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 1px 4px rgba(31,122,64,0.08), 0 0 0 1px rgba(31,122,64,0.06);
     border: 1px solid var(--border-light);
     overflow: hidden;
 }
@@ -477,7 +489,7 @@ input, select, textarea {
     background: var(--white);
     border-radius: var(--radius);
     padding: 1.25rem;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 1px 4px rgba(31,122,64,0.08);
     border: 1px solid var(--border-light);
     display: flex;
     align-items: center;
@@ -1253,4 +1265,258 @@ input:checked + .toggle-slider::before {
 
 .barcode-input-row input {
     flex: 1;
+}
+
+/* ============================================================
+   Colori categorie prodotti
+   ============================================================ */
+
+/* Header sezione categoria nella vista "per categoria" */
+.category-section { margin-bottom: 1.75rem; }
+
+.category-header {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: var(--radius);
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.85rem;
+    border-left: 4px solid currentColor;
+}
+
+.category-header .cat-icon { font-size: 1.3rem; }
+.category-header .cat-count {
+    margin-left: auto;
+    font-size: 0.78rem;
+    opacity: 0.7;
+    font-weight: 600;
+}
+
+/* Badge categoria sulle card prodotto */
+.cat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: var(--radius-full);
+    font-size: 0.73rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* Colori per ogni categoria */
+.cat-latticini  { --cat-bg: #fff8e1; --cat-border: #ffe082; --cat-text: #c56a00; }
+.cat-verdura    { --cat-bg: #e8f5e9; --cat-border: #a5d6a7; --cat-text: #2e7d32; }
+.cat-frutta     { --cat-bg: #fce4ec; --cat-border: #f48fb1; --cat-text: #ad1457; }
+.cat-carne      { --cat-bg: #fbe9e7; --cat-border: #ffab91; --cat-text: #bf360c; }
+.cat-pesce      { --cat-bg: #e3f2fd; --cat-border: #90caf9; --cat-text: #1565c0; }
+.cat-cereali    { --cat-bg: #fff3e0; --cat-border: #ffcc80; --cat-text: #e65100; }
+.cat-surgelati  { --cat-bg: #e8eaf6; --cat-border: #9fa8da; --cat-text: #283593; }
+.cat-bevande    { --cat-bg: #e1f5fe; --cat-border: #81d4fa; --cat-text: #0277bd; }
+.cat-condimenti { --cat-bg: #f3e5f5; --cat-border: #ce93d8; --cat-text: #6a1b9a; }
+.cat-snack      { --cat-bg: #fbe9e7; --cat-border: #ef9a9a; --cat-text: #c62828; }
+.cat-conserve   { --cat-bg: #f1f8e9; --cat-border: #c5e1a5; --cat-text: #33691e; }
+.cat-altro      { --cat-bg: #f5f5f5; --cat-border: #e0e0e0; --cat-text: #546e7a; }
+
+/* Applica i colori alle classi */
+[class*="cat-"] .category-header,
+.category-header[class*="cat-"] {
+    background: var(--cat-bg);
+    color: var(--cat-text);
+    border-left-color: var(--cat-text);
+}
+
+.cat-badge[class*="cat-"] {
+    background: var(--cat-bg);
+    color: var(--cat-text);
+    border: 1px solid var(--cat-border);
+}
+
+/* View toggle per dispensa */
+.view-toggle {
+    display: flex;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 3px;
+    gap: 3px;
+}
+
+.view-btn {
+    padding: 0.45rem 0.9rem;
+    background: transparent;
+    border: none;
+    border-radius: calc(var(--radius) - 1px);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.18s;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.view-btn.active {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: var(--shadow-sm);
+}
+
+.view-btn:not(.active):hover {
+    color: var(--primary);
+    background: var(--green-50);
+}
+
+/* Modal prodotto step-wizard */
+.product-search-step, .product-add-step { }
+
+.product-search-results {
+    max-height: 320px;
+    overflow-y: auto;
+    margin-top: 0.75rem;
+}
+
+.product-result-item {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.75rem;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: 0.5rem;
+    background: var(--white);
+}
+
+.product-result-item:hover {
+    border-color: var(--primary);
+    background: var(--green-50);
+}
+
+.product-result-item.selected {
+    border-color: var(--primary);
+    background: var(--primary-bg);
+}
+
+.product-result-img {
+    width: 52px;
+    height: 52px;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    flex-shrink: 0;
+}
+
+.product-result-placeholder {
+    width: 52px;
+    height: 52px;
+    border-radius: var(--radius-sm);
+    background: var(--green-100);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.product-result-info { flex: 1; min-width: 0; }
+
+.product-result-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-result-brand {
+    font-size: 0.78rem;
+    color: var(--text-light);
+    margin-top: 0.1rem;
+}
+
+/* Preview prodotto selezionato */
+.selected-product-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.85rem;
+    background: var(--green-50);
+    border: 1.5px solid var(--primary-light);
+    border-radius: var(--radius);
+    margin-bottom: 1.1rem;
+}
+
+.selected-product-preview img {
+    width: 52px; height: 52px;
+    object-fit: contain;
+    border-radius: var(--radius-sm);
+    background: white;
+    flex-shrink: 0;
+}
+
+.selected-product-preview h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.selected-product-preview p {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-top: 0.1rem;
+}
+
+/* Step indicators */
+.step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem;
+    font-size: 0.82rem;
+    color: var(--text-light);
+}
+
+.step-dot {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: var(--border);
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.step-dot.active {
+    background: var(--primary);
+    color: white;
+}
+
+.step-dot.done {
+    background: var(--success);
+    color: white;
+}
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    border-radius: 1px;
+}
+
+.step-line.done { background: var(--success); }
+
+/* Select categoria con icona */
+.cat-select-option { padding-left: 0.5rem; }
+
+/* Striscia colorata in testa alla card prodotto */
+.product-card-stripe {
+    height: 4px;
+    background: var(--cat-text, var(--primary));
 }

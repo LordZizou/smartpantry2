@@ -42,16 +42,15 @@ $stmt->execute([$userId]);
 $pantryIngredients = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
 // Costruisci la URL per Spoonacular complexSearch
-// fillIngredients=true mostra quali ingredienti della lista includeIngredients sono presenti
+// NON usiamo includeIngredients: vogliamo tutte le ricette con quel nome,
+// poi confrontiamo manualmente con la dispensa per calcolare la compatibilità.
+// Questo permette di cercare qualsiasi ricetta anche con 0 ingredienti disponibili.
 $params = http_build_query([
-    'apiKey'              => SPOONACULAR_API_KEY,
-    'query'               => $query,
-    'number'              => $number,
-    'fillIngredients'     => 'true',
-    'addRecipeInformation' => 'false',
+    'apiKey'               => SPOONACULAR_API_KEY,
+    'query'                => $query,
+    'number'               => $number,
     'instructionsRequired' => 'true',
-    // Passa gli ingredienti della dispensa per confrontarli
-    'includeIngredients'  => implode(',', array_slice($pantryIngredients, 0, 20)),
+    'addRecipeInformation' => 'false',
 ]);
 
 $url     = SPOONACULAR_URL . '/recipes/complexSearch?' . $params;

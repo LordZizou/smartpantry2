@@ -5,10 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Pantry — La mia dispensa</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        .hidden { display: none !important; }
+    </style>
 </head>
 <body>
 
-<!-- Overlay mobile sidebar -->
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
 <div class="app-layout">
@@ -18,27 +20,17 @@
             <span class="logo-icon">🥦</span>
             <h2>Smart Pantry</h2>
         </div>
-
         <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item">
-                <span class="nav-icon">🏠</span> Dashboard
-            </a>
-            <a href="pantry.html" class="nav-item active">
-                <span class="nav-icon">📦</span> La mia dispensa
-            </a>
-            <a href="scanner.html" class="nav-item">
-                <span class="nav-icon">📷</span> Scanner barcode
-            </a>
-            <a href="recipes.html" class="nav-item">
-                <span class="nav-icon">🍽️</span> Ricette consigliate
-            </a>
+            <a href="dashboard.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+            <a href="pantry.html"    class="nav-item active"><span class="nav-icon">📦</span> La mia dispensa</a>
+            <a href="scanner.html"   class="nav-item"><span class="nav-icon">📷</span> Scanner barcode</a>
+            <a href="recipes.html"   class="nav-item"><span class="nav-icon">🍽️</span> Ricette</a>
         </nav>
-
         <div class="sidebar-footer">
             <div class="sidebar-user">
                 <div class="user-avatar" id="sidebar-avatar">U</div>
                 <div class="user-info">
-                    <div class="user-name" id="sidebar-username">Utente</div>
+                    <div class="user-name"  id="sidebar-username">Utente</div>
                     <div class="user-email">Smart Pantry</div>
                 </div>
             </div>
@@ -46,24 +38,19 @@
         </div>
     </aside>
 
-    <!-- Contenuto principale -->
     <div class="main-content">
-        <!-- Topbar -->
         <header class="topbar">
             <button class="hamburger" id="hamburger">☰</button>
             <h1 class="topbar-title">La mia dispensa</h1>
             <div class="topbar-actions">
-                <button class="btn btn-primary btn-sm" onclick="openModal('modal-add')">
-                    + Aggiungi prodotto
-                </button>
+                <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Aggiungi</button>
             </div>
         </header>
 
-        <!-- Pagina -->
         <main class="page-content">
 
-            <!-- Statistiche dispensa -->
-            <div class="stats-grid" style="margin-bottom: 1.25rem;">
+            <!-- Statistiche -->
+            <div class="stats-grid" style="margin-bottom:1.25rem;">
                 <div class="stat-card">
                     <div class="stat-icon green">📦</div>
                     <div class="stat-info">
@@ -75,7 +62,7 @@
                     <div class="stat-icon yellow">⚠️</div>
                     <div class="stat-info">
                         <div class="stat-value" id="stat-expiring">—</div>
-                        <div class="stat-label">In scadenza</div>
+                        <div class="stat-label">In scadenza (7 gg)</div>
                     </div>
                 </div>
                 <div class="stat-card">
@@ -87,17 +74,30 @@
                 </div>
             </div>
 
-            <!-- Toolbar ricerca e filtri -->
-            <div class="pantry-toolbar">
-                <div class="search-box">
+            <!-- Toolbar: ricerca + filtri + vista -->
+            <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:0.9rem; flex-wrap:wrap;">
+                <!-- Ricerca -->
+                <div class="search-box" style="flex:1; min-width:200px; position:relative;">
                     <span class="search-icon">🔍</span>
                     <input class="form-control" type="text" id="search-input" placeholder="Cerca prodotto…">
                 </div>
+
+                <!-- Scanner shortcut -->
                 <a href="scanner.html" class="btn btn-outline btn-sm">📷 Scansiona</a>
+
+                <!-- View toggle -->
+                <div class="view-toggle" id="view-toggle">
+                    <button class="view-btn active" data-view="expiry" title="Vista per scadenza">
+                        📅 Per scadenza
+                    </button>
+                    <button class="view-btn" data-view="category" title="Vista per categoria">
+                        🏷️ Per categoria
+                    </button>
+                </div>
             </div>
 
-            <!-- Filtri -->
-            <div class="filters">
+            <!-- Filtri scadenza (solo in vista "per scadenza") -->
+            <div class="filters" id="expiry-filters">
                 <button class="filter-btn active" data-filter="all">Tutti</button>
                 <button class="filter-btn" data-filter="expiring">⚠️ In scadenza</button>
                 <button class="filter-btn" data-filter="expired">❌ Scaduti</button>
@@ -110,79 +110,138 @@
                 <span>Caricamento dispensa…</span>
             </div>
 
-            <!-- Griglia prodotti -->
-            <div class="pantry-grid" id="pantry-grid"></div>
+            <!-- Vista per scadenza -->
+            <div class="pantry-grid" id="pantry-grid" style="display:none;"></div>
+
+            <!-- Vista per categoria -->
+            <div id="category-view" style="display:none;"></div>
 
         </main>
     </div>
 </div>
 
-<!-- Modal: Aggiungi prodotto -->
+<!-- ===== MODAL: Aggiungi prodotto (wizard 2 step) ===== -->
 <div class="modal-overlay" id="modal-add">
-    <div class="modal">
+    <div class="modal" style="max-width:560px;">
         <div class="modal-header">
-            <span>📦</span>
-            <span class="modal-title">Aggiungi prodotto</span>
-            <button class="modal-close" onclick="closeModal('modal-add')">×</button>
+            <span id="modal-add-icon">🔍</span>
+            <span class="modal-title" id="modal-add-title">Cerca prodotto</span>
+            <button class="modal-close" onclick="closeAddModal()">×</button>
         </div>
         <div class="modal-body">
-            <form id="form-add">
+
+            <!-- Step indicator -->
+            <div class="step-indicator">
+                <div class="step-dot active" id="step-dot-1">1</div>
+                <div class="step-line" id="step-line-1"></div>
+                <div class="step-dot" id="step-dot-2">2</div>
+            </div>
+
+            <!-- ===== STEP 1: Cerca prodotto ===== -->
+            <div id="step-search">
+                <!-- Ricerca per nome -->
                 <div class="form-group">
-                    <label class="form-label" for="name">Nome prodotto *</label>
-                    <input class="form-control" type="text" id="name" placeholder="es. Latte intero" required>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="brand">Marca</label>
-                    <input class="form-control" type="text" id="brand" placeholder="es. Granarolo">
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="form-label" for="quantity">Quantità *</label>
-                        <input class="form-control" type="number" id="quantity" value="1" min="0.1" step="0.1" required>
+                    <label class="form-label">Cerca per nome (OpenFoodFacts)</label>
+                    <div style="display:flex; gap:0.5rem;">
+                        <input class="form-control" type="text" id="of-search-input"
+                               placeholder="es. Latte Granarolo, Pasta Barilla…" autocomplete="off">
+                        <button class="btn btn-primary" id="btn-of-search">Cerca</button>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label" for="unit">Unità *</label>
-                        <select class="form-control" id="unit">
-                            <option value="pz">pezzi</option>
-                            <option value="g">grammi (g)</option>
-                            <option value="kg">kg</option>
-                            <option value="ml">ml</option>
-                            <option value="l">litri (l)</option>
-                            <option value="conf">confezioni</option>
-                            <option value="bst">bustine</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="expiry">Data scadenza</label>
-                    <input class="form-control" type="date" id="expiry">
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="location">Posizione</label>
-                    <select class="form-control" id="location">
-                        <option value="">-- seleziona --</option>
-                        <option value="dispensa">Dispensa</option>
-                        <option value="frigo">Frigo</option>
-                        <option value="freezer">Freezer</option>
-                        <option value="cantina">Cantina</option>
-                        <option value="altro">Altro</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label" for="notes">Note</label>
-                    <textarea class="form-control" id="notes" rows="2" placeholder="Note opzionali…"></textarea>
                 </div>
 
-                <div class="modal-footer" style="padding: 0; border: none; margin-top: 1rem;">
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-add')">Annulla</button>
-                    <button type="submit" class="btn btn-primary">+ Aggiungi</button>
+                <!-- Loader -->
+                <div id="of-search-loader" class="loading hidden" style="padding:1.5rem;">
+                    <div class="spinner"></div>
+                    <span>Ricerca su OpenFoodFacts…</span>
                 </div>
-            </form>
+
+                <!-- Risultati ricerca -->
+                <div id="of-search-results" class="product-search-results hidden"></div>
+
+                <!-- Opzione inserimento manuale (con categoria obbligatoria) -->
+                <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border-light);">
+                    <p style="font-size:0.85rem; color:var(--text-light); margin-bottom:0.6rem;">
+                        Prodotto non trovato su OpenFoodFacts?
+                    </p>
+                    <button class="btn btn-secondary btn-sm" id="btn-manual-fallback">
+                        ✏️ Inserisci manualmente
+                    </button>
+                </div>
+            </div>
+
+            <!-- ===== STEP 2: Dettagli prodotto ===== -->
+            <div id="step-details" class="hidden">
+                <!-- Anteprima prodotto selezionato -->
+                <div class="selected-product-preview" id="selected-preview"></div>
+
+                <!-- Form dettagli -->
+                <form id="form-add">
+                    <!-- Campi nascosti (dati dal prodotto trovato) -->
+                    <input type="hidden" id="add-name">
+                    <input type="hidden" id="add-brand">
+                    <input type="hidden" id="add-barcode">
+
+                    <!-- Categoria (obbligatoria) -->
+                    <div class="form-group">
+                        <label class="form-label" for="add-category">Categoria *</label>
+                        <select class="form-control" id="add-category" required>
+                            <option value="">— seleziona categoria —</option>
+                        </select>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="add-quantity">Quantità *</label>
+                            <input class="form-control" type="number" id="add-quantity" value="1" min="0.1" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="add-unit">Unità *</label>
+                            <select class="form-control" id="add-unit">
+                                <option value="pz">pezzi</option>
+                                <option value="g">grammi (g)</option>
+                                <option value="kg">kg</option>
+                                <option value="ml">ml</option>
+                                <option value="l">litri (l)</option>
+                                <option value="conf">confezioni</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="add-expiry">Data scadenza</label>
+                        <input class="form-control" type="date" id="add-expiry">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="add-location">Posizione</label>
+                        <select class="form-control" id="add-location">
+                            <option value="">— seleziona —</option>
+                            <option value="dispensa">Dispensa</option>
+                            <option value="frigo">Frigo</option>
+                            <option value="freezer">Freezer</option>
+                            <option value="cantina">Cantina</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="add-notes">Note</label>
+                        <textarea class="form-control" id="add-notes" rows="2" placeholder="Note opzionali…"></textarea>
+                    </div>
+
+                    <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
+                        <button type="button" class="btn btn-secondary" id="btn-back-to-search">← Indietro</button>
+                        <button type="submit" class="btn btn-primary" style="flex:1;" id="btn-add-submit">
+                            ✓ Aggiungi alla dispensa
+                        </button>
+                    </div>
+                </form>
+            </div>
+
         </div>
     </div>
 </div>
 
-<!-- Modal: Modifica prodotto -->
+<!-- ===== MODAL: Modifica prodotto ===== -->
 <div class="modal-overlay" id="modal-edit">
     <div class="modal">
         <div class="modal-header">
@@ -200,6 +259,12 @@
                     <label class="form-label" for="edit-brand">Marca</label>
                     <input class="form-control" type="text" id="edit-brand">
                 </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-category">Categoria *</label>
+                    <select class="form-control" id="edit-category" required>
+                        <option value="">— seleziona categoria —</option>
+                    </select>
+                </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label class="form-label" for="edit-quantity">Quantità *</label>
@@ -214,7 +279,6 @@
                             <option value="ml">ml</option>
                             <option value="l">litri (l)</option>
                             <option value="conf">confezioni</option>
-                            <option value="bst">bustine</option>
                         </select>
                     </div>
                 </div>
@@ -225,22 +289,20 @@
                 <div class="form-group">
                     <label class="form-label" for="edit-location">Posizione</label>
                     <select class="form-control" id="edit-location">
-                        <option value="">-- seleziona --</option>
+                        <option value="">— seleziona —</option>
                         <option value="dispensa">Dispensa</option>
                         <option value="frigo">Frigo</option>
                         <option value="freezer">Freezer</option>
                         <option value="cantina">Cantina</option>
-                        <option value="altro">Altro</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="edit-notes">Note</label>
                     <textarea class="form-control" id="edit-notes" rows="2"></textarea>
                 </div>
-
-                <div class="modal-footer" style="padding: 0; border: none; margin-top: 1rem;">
+                <div class="modal-footer" style="padding:0; border:none; margin-top:1rem;">
                     <button type="button" class="btn btn-secondary" onclick="closeModal('modal-edit')">Annulla</button>
-                    <button type="submit" class="btn btn-primary">💾 Salva</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva modifiche</button>
                 </div>
             </form>
         </div>
