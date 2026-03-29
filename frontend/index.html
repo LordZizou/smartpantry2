@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Pantry — Accedi</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .hidden { display: none !important; }
+        .form-error {
+            color: #c62828;
+            background: var(--danger-bg);
+            border: 1px solid #ef9a9a;
+            border-radius: var(--radius-sm);
+            padding: 0.65rem 0.9rem;
+            font-size: 0.88rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="auth-page">
+
+<div class="auth-card">
+    <!-- Logo -->
+    <div class="auth-logo">
+        <span class="logo-icon">🥦</span>
+        <h1>Smart Pantry</h1>
+        <p>Gestisci la tua dispensa intelligente</p>
+    </div>
+
+    <!-- Tab Login / Registrazione -->
+    <div class="auth-tabs">
+        <button class="auth-tab active" data-tab="login">Accedi</button>
+        <button class="auth-tab" data-tab="register">Registrati</button>
+    </div>
+
+    <!-- Form Login -->
+    <form id="form-login" class="auth-form">
+        <div id="error-login" class="form-error hidden"></div>
+
+        <div class="form-group">
+            <label class="form-label" for="login-email">Email o Username</label>
+            <input class="form-control" type="text" id="login-email" placeholder="mario@esempio.it" autocomplete="email" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="login-password">Password</label>
+            <input class="form-control" type="password" id="login-password" placeholder="••••••••" autocomplete="current-password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg">
+            Accedi
+        </button>
+    </form>
+
+    <!-- Form Registrazione -->
+    <form id="form-register" class="auth-form hidden">
+        <div id="error-register" class="form-error hidden"></div>
+
+        <div class="form-group">
+            <label class="form-label" for="reg-username">Username</label>
+            <input class="form-control" type="text" id="reg-username" placeholder="mario_rossi" autocomplete="username" required>
+            <div class="form-hint">Minimo 3 caratteri, massimo 50</div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="reg-email">Email</label>
+            <input class="form-control" type="email" id="reg-email" placeholder="mario@esempio.it" autocomplete="email" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="reg-password">Password</label>
+            <input class="form-control" type="password" id="reg-password" placeholder="Minimo 6 caratteri" autocomplete="new-password" required>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label" for="reg-confirm">Conferma password</label>
+            <input class="form-control" type="password" id="reg-confirm" placeholder="Ripeti la password" autocomplete="new-password" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full btn-lg">
+            Crea account
+        </button>
+    </form>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+</body>
+</html>

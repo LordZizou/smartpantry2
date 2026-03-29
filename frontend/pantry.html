@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Pantry — La mia dispensa</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Overlay mobile sidebar -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">🥦</span>
+            <h2>Smart Pantry</h2>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon">🏠</span> Dashboard
+            </a>
+            <a href="pantry.html" class="nav-item active">
+                <span class="nav-icon">📦</span> La mia dispensa
+            </a>
+            <a href="scanner.html" class="nav-item">
+                <span class="nav-icon">📷</span> Scanner barcode
+            </a>
+            <a href="recipes.html" class="nav-item">
+                <span class="nav-icon">🍽️</span> Ricette consigliate
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebar-avatar">U</div>
+                <div class="user-info">
+                    <div class="user-name" id="sidebar-username">Utente</div>
+                    <div class="user-email">Smart Pantry</div>
+                </div>
+            </div>
+            <button class="btn btn-secondary btn-sm btn-full" id="btn-logout">Esci</button>
+        </div>
+    </aside>
+
+    <!-- Contenuto principale -->
+    <div class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <button class="hamburger" id="hamburger">☰</button>
+            <h1 class="topbar-title">La mia dispensa</h1>
+            <div class="topbar-actions">
+                <button class="btn btn-primary btn-sm" onclick="openModal('modal-add')">
+                    + Aggiungi prodotto
+                </button>
+            </div>
+        </header>
+
+        <!-- Pagina -->
+        <main class="page-content">
+
+            <!-- Statistiche dispensa -->
+            <div class="stats-grid" style="margin-bottom: 1.25rem;">
+                <div class="stat-card">
+                    <div class="stat-icon green">📦</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-total">—</div>
+                        <div class="stat-label">Totale prodotti</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon yellow">⚠️</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-expiring">—</div>
+                        <div class="stat-label">In scadenza</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon red">❌</div>
+                    <div class="stat-info">
+                        <div class="stat-value" id="stat-expired">—</div>
+                        <div class="stat-label">Scaduti</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toolbar ricerca e filtri -->
+            <div class="pantry-toolbar">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input class="form-control" type="text" id="search-input" placeholder="Cerca prodotto…">
+                </div>
+                <a href="scanner.html" class="btn btn-outline btn-sm">📷 Scansiona</a>
+            </div>
+
+            <!-- Filtri -->
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">Tutti</button>
+                <button class="filter-btn" data-filter="expiring">⚠️ In scadenza</button>
+                <button class="filter-btn" data-filter="expired">❌ Scaduti</button>
+                <button class="filter-btn" data-filter="ok">✅ OK</button>
+            </div>
+
+            <!-- Loading -->
+            <div id="list-loader" class="loading">
+                <div class="spinner"></div>
+                <span>Caricamento dispensa…</span>
+            </div>
+
+            <!-- Griglia prodotti -->
+            <div class="pantry-grid" id="pantry-grid"></div>
+
+        </main>
+    </div>
+</div>
+
+<!-- Modal: Aggiungi prodotto -->
+<div class="modal-overlay" id="modal-add">
+    <div class="modal">
+        <div class="modal-header">
+            <span>📦</span>
+            <span class="modal-title">Aggiungi prodotto</span>
+            <button class="modal-close" onclick="closeModal('modal-add')">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="form-add">
+                <div class="form-group">
+                    <label class="form-label" for="name">Nome prodotto *</label>
+                    <input class="form-control" type="text" id="name" placeholder="es. Latte intero" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="brand">Marca</label>
+                    <input class="form-control" type="text" id="brand" placeholder="es. Granarolo">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="quantity">Quantità *</label>
+                        <input class="form-control" type="number" id="quantity" value="1" min="0.1" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="unit">Unità *</label>
+                        <select class="form-control" id="unit">
+                            <option value="pz">pezzi</option>
+                            <option value="g">grammi (g)</option>
+                            <option value="kg">kg</option>
+                            <option value="ml">ml</option>
+                            <option value="l">litri (l)</option>
+                            <option value="conf">confezioni</option>
+                            <option value="bst">bustine</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="expiry">Data scadenza</label>
+                    <input class="form-control" type="date" id="expiry">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="location">Posizione</label>
+                    <select class="form-control" id="location">
+                        <option value="">-- seleziona --</option>
+                        <option value="dispensa">Dispensa</option>
+                        <option value="frigo">Frigo</option>
+                        <option value="freezer">Freezer</option>
+                        <option value="cantina">Cantina</option>
+                        <option value="altro">Altro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="notes">Note</label>
+                    <textarea class="form-control" id="notes" rows="2" placeholder="Note opzionali…"></textarea>
+                </div>
+
+                <div class="modal-footer" style="padding: 0; border: none; margin-top: 1rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-add')">Annulla</button>
+                    <button type="submit" class="btn btn-primary">+ Aggiungi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Modifica prodotto -->
+<div class="modal-overlay" id="modal-edit">
+    <div class="modal">
+        <div class="modal-header">
+            <span>✏️</span>
+            <span class="modal-title">Modifica prodotto</span>
+            <button class="modal-close" onclick="closeModal('modal-edit')">×</button>
+        </div>
+        <div class="modal-body">
+            <form id="form-edit">
+                <div class="form-group">
+                    <label class="form-label" for="edit-name">Nome prodotto *</label>
+                    <input class="form-control" type="text" id="edit-name" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-brand">Marca</label>
+                    <input class="form-control" type="text" id="edit-brand">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="edit-quantity">Quantità *</label>
+                        <input class="form-control" type="number" id="edit-quantity" min="0.1" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="edit-unit">Unità *</label>
+                        <select class="form-control" id="edit-unit">
+                            <option value="pz">pezzi</option>
+                            <option value="g">grammi (g)</option>
+                            <option value="kg">kg</option>
+                            <option value="ml">ml</option>
+                            <option value="l">litri (l)</option>
+                            <option value="conf">confezioni</option>
+                            <option value="bst">bustine</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-expiry">Data scadenza</label>
+                    <input class="form-control" type="date" id="edit-expiry">
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-location">Posizione</label>
+                    <select class="form-control" id="edit-location">
+                        <option value="">-- seleziona --</option>
+                        <option value="dispensa">Dispensa</option>
+                        <option value="frigo">Frigo</option>
+                        <option value="freezer">Freezer</option>
+                        <option value="cantina">Cantina</option>
+                        <option value="altro">Altro</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-notes">Note</label>
+                    <textarea class="form-control" id="edit-notes" rows="2"></textarea>
+                </div>
+
+                <div class="modal-footer" style="padding: 0; border: none; margin-top: 1rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('modal-edit')">Annulla</button>
+                    <button type="submit" class="btn btn-primary">💾 Salva</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/pantry.js"></script>
+</body>
+</html>

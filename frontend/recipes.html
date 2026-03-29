@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Pantry — Ricette consigliate</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .border-success { border-top: 3px solid var(--success); }
+        #recipes-stats  { display: none; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+    </style>
+</head>
+<body>
+
+<!-- Overlay mobile sidebar -->
+<div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+<div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-icon">🥦</span>
+            <h2>Smart Pantry</h2>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon">🏠</span> Dashboard
+            </a>
+            <a href="pantry.html" class="nav-item">
+                <span class="nav-icon">📦</span> La mia dispensa
+            </a>
+            <a href="scanner.html" class="nav-item">
+                <span class="nav-icon">📷</span> Scanner barcode
+            </a>
+            <a href="recipes.html" class="nav-item active">
+                <span class="nav-icon">🍽️</span> Ricette consigliate
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="sidebar-user">
+                <div class="user-avatar" id="sidebar-avatar">U</div>
+                <div class="user-info">
+                    <div class="user-name" id="sidebar-username">Utente</div>
+                    <div class="user-email">Smart Pantry</div>
+                </div>
+            </div>
+            <button class="btn btn-secondary btn-sm btn-full" id="btn-logout">Esci</button>
+        </div>
+    </aside>
+
+    <!-- Contenuto principale -->
+    <div class="main-content">
+        <!-- Topbar -->
+        <header class="topbar">
+            <button class="hamburger" id="hamburger">☰</button>
+            <h1 class="topbar-title">Ricette consigliate</h1>
+            <div class="topbar-actions">
+                <button id="btn-reload" class="btn btn-outline btn-sm">🔄 Aggiorna</button>
+            </div>
+        </header>
+
+        <!-- Pagina -->
+        <main class="page-content">
+
+            <!-- Controlli -->
+            <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.25rem; flex-wrap: wrap;">
+                <label class="toggle-label">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="toggle-pantry-only">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Solo ingredienti in dispensa</span>
+                </label>
+                <p style="font-size: 0.85rem; color: var(--text-light);">
+                    Le ricette vengono suggerite in base agli ingredienti presenti nella tua dispensa, ordinate per compatibilità.
+                </p>
+            </div>
+
+            <!-- Statistiche risultati -->
+            <div id="recipes-stats" class="stats-grid"></div>
+
+            <!-- Loading -->
+            <div id="recipes-loader" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <span>Ricerca ricette in corso…</span>
+            </div>
+
+            <!-- Griglia ricette -->
+            <div class="recipes-grid" id="recipes-grid">
+                <div class="loading" style="grid-column: 1/-1; padding: 3rem;">
+                    <div class="spinner"></div>
+                    <span>Caricamento ricette…</span>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/recipes.js"></script>
+</body>
+</html>
