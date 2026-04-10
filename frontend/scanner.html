@@ -7,6 +7,70 @@
     <link rel="stylesheet" href="css/style.css">
     <style>
         .hidden { display: none !important; }
+
+        /* Layout 2 colonne per desktop */
+        .scanner-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            align-items: start;
+        }
+        @media (max-width: 900px) {
+            .scanner-layout { grid-template-columns: 1fr; }
+        }
+
+        /* Tabs stile pillola */
+        .scanner-tabs {
+            display: flex;
+            background: rgba(255,255,255,0.5);
+            border-radius: var(--radius-full);
+            padding: 5px;
+            gap: 4px;
+            margin-bottom: 1.75rem;
+            width: fit-content;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        .scanner-tab {
+            padding: 0.55rem 1.4rem;
+            background: transparent;
+            border: none;
+            border-radius: var(--radius-full);
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all var(--transition-med);
+        }
+        .scanner-tab.active {
+            background: var(--primary);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(22,163,74,0.35);
+        }
+
+        /* Hero intro */
+        .page-intro {
+            margin-bottom: 1.75rem;
+        }
+        .page-intro h2 {
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 0.35rem;
+        }
+        .page-intro p {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+
+        /* Sezione senza card — testo diretto */
+        .scan-section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid rgba(34,197,94,0.25);
+        }
     </style>
 </head>
 <body>
@@ -45,26 +109,25 @@
     </header>
 
     <main class="page-content">
-        <div class="scanner-container">
 
-            <!-- Tab: Barcode / Cerca per nome -->
-            <div class="scanner-tabs">
-                <button class="scanner-tab active" data-tab="barcode">
-                    Scansiona barcode
-                </button>
-                <button class="scanner-tab" data-tab="name">
-                    Cerca per nome
-                </button>
-            </div>
+        <!-- Intro -->
+        <div class="page-intro">
+            <h2>Aggiungi un prodotto</h2>
+            <p>Scansiona il barcode con la fotocamera oppure cerca il prodotto per nome su OpenFoodFacts.</p>
+        </div>
 
-            <!-- ===== SEZIONE BARCODE ===== -->
-            <div id="section-barcode">
-                <div class="alert alert-info" style="margin-bottom:1rem;">
-                    <div>Inquadra il barcode con la fotocamera oppure inseriscilo manualmente.
-                    I dati vengono recuperati da <strong>OpenFoodFacts</strong>.</div>
-                </div>
+        <!-- Tab -->
+        <div class="scanner-tabs">
+            <button class="scanner-tab active" data-tab="barcode">Scansiona barcode</button>
+            <button class="scanner-tab" data-tab="name">Cerca per nome</button>
+        </div>
 
-                <div class="card" style="margin-bottom:1rem;">
+        <!-- ===== SEZIONE BARCODE ===== -->
+        <div id="section-barcode">
+            <div class="scanner-layout">
+
+                <!-- Colonna sinistra: fotocamera -->
+                <div class="card">
                     <div class="card-header">
                         <span class="card-title">Fotocamera</span>
                     </div>
@@ -81,55 +144,54 @@
                     </div>
                 </div>
 
-                <!-- Input barcode manuale -->
-                <div class="card" style="margin-bottom:1rem;">
-                    <div class="card-header">
-                        <span class="card-title">Inserisci barcode manualmente</span>
-                    </div>
-                    <div class="card-body">
-                        <form id="form-manual-barcode">
-                            <div class="barcode-input-row">
-                                <input class="form-control" type="text" id="manual-barcode"
-                                       placeholder="es. 8001234567890"
-                                       pattern="[0-9A-Za-z\-]{4,20}">
-                                <button type="submit" class="btn btn-primary">Cerca</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ===== SEZIONE CERCA PER NOME ===== -->
-            <div id="section-name" class="hidden">
-                <div class="alert alert-info" style="margin-bottom:1rem;">
-                    <div>Cerca il prodotto per nome su <strong>OpenFoodFacts</strong>. Vengono mostrate le corrispondenze: scegli quella giusta.</div>
-                </div>
-
-                <div class="card" style="margin-bottom:1rem;">
-                    <div class="card-header">
-                        <span class="card-title">Cerca prodotto per nome</span>
-                    </div>
-                    <div class="card-body">
-                        <div style="display:flex; gap:0.5rem; margin-bottom:0.75rem;">
-                            <input class="form-control" type="text" id="name-search-input"
-                                   placeholder="es. Nutella, Latte Granarolo, Pasta Barilla…"
-                                   autocomplete="off">
-                            <button id="btn-name-search" class="btn btn-primary">Cerca</button>
+                <!-- Colonna destra: barcode manuale + risultato -->
+                <div>
+                    <div class="card" style="margin-bottom:1rem;">
+                        <div class="card-header">
+                            <span class="card-title">Inserisci barcode manualmente</span>
                         </div>
-
-                        <div id="name-search-loader" class="loading hidden" style="padding:1rem;">
-                            <div class="spinner"></div><span>Ricerca su OpenFoodFacts…</span>
+                        <div class="card-body">
+                            <form id="form-manual-barcode">
+                                <div class="barcode-input-row">
+                                    <input class="form-control" type="text" id="manual-barcode"
+                                           placeholder="es. 8001234567890"
+                                           pattern="[0-9A-Za-z\-]{4,20}">
+                                    <button type="submit" class="btn btn-primary">Cerca</button>
+                                </div>
+                            </form>
                         </div>
-
-                        <div id="name-search-results" class="product-search-results hidden"></div>
                     </div>
+
+                    <!-- Risultato prodotto barcode -->
+                    <div id="result-section" class="hidden"></div>
                 </div>
+
             </div>
-
-            <!-- ===== RISULTATO PRODOTTO (comune a barcode e nome) ===== -->
-            <div id="result-section" class="hidden"></div>
-
         </div>
+
+        <!-- ===== SEZIONE CERCA PER NOME ===== -->
+        <div id="section-name" class="hidden">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Cerca prodotto per nome</span>
+                </div>
+                <div class="card-body">
+                    <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+                        <input class="form-control" type="text" id="name-search-input"
+                               placeholder="es. Nutella, Latte Granarolo, Pasta Barilla…"
+                               autocomplete="off">
+                        <button id="btn-name-search" class="btn btn-primary">Cerca</button>
+                    </div>
+
+                    <div id="name-search-loader" class="loading hidden" style="padding:1rem;">
+                        <div class="spinner"></div><span>Ricerca su OpenFoodFacts…</span>
+                    </div>
+
+                    <div id="name-search-results" class="product-search-results hidden"></div>
+                </div>
+            </div>
+        </div>
+
     </main>
 </div>
 

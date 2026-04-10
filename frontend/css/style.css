@@ -1,5 +1,5 @@
 /* ============================================================
-   Smart Pantry — Foglio di stile principale
+   Smart Pantry — Foglio di stile principale v3
    CSS vanilla con variabili custom, nessun framework
    ============================================================ */
 
@@ -7,7 +7,7 @@
 :root {
     /* Palette verde principale */
     --primary:        #16a34a;
-    --primary-dark:   #15803d;
+    --primary-dark:   #14532d;
     --primary-light:  #22c55e;
     --primary-bg:     #dcfce7;
 
@@ -30,19 +30,19 @@
     --info:           #3b82f6;
     --info-bg:        #eff6ff;
 
-    --text:           #0f172a;
-    --text-light:     #475569;
-    --text-muted:     #94a3b8;
-    --border:         #e2e8f0;
-    --border-light:   #f1f5f9;
+    --text:           #0f2d1a;
+    --text-light:     #374c3a;
+    --text-muted:     #6b8c72;
+    --border:         #bbf7d0;
+    --border-light:   #dcfce7;
     --white:          #ffffff;
-    --bg:             #f8fafc;
-    --bg-2:           #f1f5f9;
+    --bg:             #e8f5e9;         /* sfondo verde chiaro visibile */
+    --bg-2:           #c8e6c9;
 
-    --shadow-sm:      0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-    --shadow:         0 4px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
-    --shadow-md:      0 8px 24px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.05);
-    --shadow-lg:      0 20px 40px rgba(0,0,0,0.12), 0 6px 12px rgba(0,0,0,0.06);
+    --shadow-sm:      0 1px 4px rgba(0,0,0,0.07);
+    --shadow:         0 4px 16px rgba(0,0,0,0.09), 0 1px 4px rgba(0,0,0,0.05);
+    --shadow-md:      0 8px 28px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.06);
+    --shadow-lg:      0 20px 48px rgba(0,0,0,0.14), 0 6px 16px rgba(0,0,0,0.07);
 
     --radius-sm:      10px;
     --radius:         16px;
@@ -69,10 +69,7 @@ html {
 
 body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: var(--bg);
-    background-image:
-        radial-gradient(ellipse 80% 60% at 20% -5%, rgba(34,197,94,0.10) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 85% 110%, rgba(59,130,246,0.06) 0%, transparent 55%);
+    background: linear-gradient(160deg, #d4edda 0%, #e8f5e9 40%, #c8e6c9 100%);
     background-attachment: fixed;
     color: var(--text);
     line-height: 1.6;
@@ -350,14 +347,12 @@ input, select, textarea {
 
 .topbar {
     height: var(--topbar-height);
-    background: rgba(255,255,255,0.82);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid rgba(255,255,255,0.6);
-    box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+    background: linear-gradient(135deg, #14532d 0%, #15803d 100%);
+    border-bottom: none;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.18);
     display: flex;
     align-items: center;
-    padding: 0 1.5rem;
+    padding: 0 2rem;
     position: sticky;
     top: 0;
     z-index: 50;
@@ -365,17 +360,21 @@ input, select, textarea {
 }
 
 .page-title {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 700;
-    color: var(--text);
+    color: #ffffff !important;
     flex: 1;
 }
 
 .topbar-title {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 700;
-    color: var(--text);
+    color: #ffffff !important;
     flex: 1;
+}
+
+.hamburger span {
+    background: #ffffff !important;
 }
 
 .topbar-end {
@@ -391,8 +390,11 @@ input, select, textarea {
 }
 
 .page-content {
-    padding: 1.5rem;
+    padding: 2rem;
     flex: 1;
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
 }
 
 /* ---------- Hamburger (3 linee CSS) ---------- */
@@ -555,10 +557,12 @@ input, select, textarea {
 
 /* Card */
 .card {
-    background: var(--white);
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
-    border: 1px solid rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.9);
     overflow: hidden;
     transition: transform var(--transition-med), box-shadow var(--transition-med);
     animation: fadeInUp 0.45s ease both;
@@ -567,15 +571,16 @@ input, select, textarea {
 .card:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-md);
+    background: rgba(255,255,255,0.88);
 }
 
 .card-header {
     padding: 1.1rem 1.4rem;
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 1px solid rgba(187,247,208,0.6);
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    background: linear-gradient(to right, rgba(248,250,252,0.8), rgba(255,255,255,0));
+    background: linear-gradient(135deg, rgba(220,252,231,0.5), rgba(255,255,255,0));
 }
 
 .card-title {
@@ -598,21 +603,38 @@ input, select, textarea {
 }
 
 .stat-card {
-    background: var(--white);
+    background: rgba(255,255,255,0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-radius: var(--radius-lg);
-    padding: 1.35rem 1.5rem;
+    padding: 1.5rem 1.75rem;
     box-shadow: var(--shadow);
-    border: 1px solid rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.9);
     display: flex;
     align-items: center;
-    gap: 1.1rem;
-    transition: transform var(--transition-med), box-shadow var(--transition-med);
+    gap: 1.25rem;
+    transition: transform var(--transition-med), box-shadow var(--transition-med), background var(--transition-med);
     animation: fadeInUp 0.45s ease both;
 }
 
 .stat-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
     box-shadow: var(--shadow-md);
+    background: rgba(255,255,255,0.92);
+}
+
+.stat-value {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--text);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.82rem;
+    color: var(--text-light);
+    margin-top: 0.25rem;
+    font-weight: 500;
 }
 
 .stat-icon {
@@ -664,12 +686,12 @@ input, select, textarea {
 .form-control {
     width: 100%;
     padding: 0.7rem 1rem;
-    border: 1.5px solid var(--border);
+    border: 1.5px solid rgba(187,247,208,0.8);
     border-radius: var(--radius);
     font-size: 0.95rem;
     color: var(--text);
-    background: var(--white);
-    transition: border-color var(--transition), box-shadow var(--transition);
+    background: rgba(255,255,255,0.85);
+    transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
     outline: none;
 }
 
@@ -764,12 +786,14 @@ input, select, textarea {
 
 /* Card prodotto */
 .product-card {
-    background: var(--white);
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
-    border: 1px solid rgba(255,255,255,0.8);
+    border: 1px solid rgba(255,255,255,0.9);
     overflow: hidden;
-    transition: box-shadow var(--transition-med), transform var(--transition-med);
+    transition: box-shadow var(--transition-med), transform var(--transition-med), background var(--transition-med);
     display: flex;
     flex-direction: column;
     animation: fadeInUp 0.4s ease both;
@@ -777,7 +801,8 @@ input, select, textarea {
 
 .product-card:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-4px);
+    transform: translateY(-5px);
+    background: rgba(255,255,255,0.95);
 }
 
 .product-card.expiring {
@@ -882,8 +907,7 @@ input, select, textarea {
 
 /* Sezione scanner barcode */
 .scanner-container {
-    max-width: 540px;
-    margin: 0 auto;
+    width: 100%;
 }
 
 #reader {
