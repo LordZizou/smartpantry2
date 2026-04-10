@@ -24,14 +24,61 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============================================================
 
 function initTabs() {
+    // Inizializza date lista spesa
+    const today = new Date();
+    const fmt = d => {
+        const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), dd = String(d.getDate()).padStart(2,'0');
+        return `${y}-${m}-${dd}`;
+    };
+    const startEl = document.getElementById('recipes-shop-start');
+    const endEl   = document.getElementById('recipes-shop-end');
+    if (startEl) startEl.value = fmt(today);
+    if (endEl)   endEl.value   = fmt(new Date(today.getTime() + 6*86400000));
+
+    document.getElementById('btn-recipes-shopping')?.addEventListener('click', loadShoppingFromRecipes);
+
     document.querySelectorAll('.pill-tab').forEach(btn => {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.tab;
             document.querySelectorAll('.pill-tab').forEach(b => b.classList.toggle('active', b === btn));
             document.getElementById('section-suggested').style.display = tab === 'suggested' ? 'block' : 'none';
             document.getElementById('section-search').style.display    = tab === 'search'    ? 'block' : 'none';
+            const shopEl = document.getElementById('section-shopping');
+            if (shopEl) shopEl.classList.toggle('hidden', tab !== 'shopping');
         });
     });
+}
+
+async function loadShoppingFromRecipes() {
+    const start = document.getElementById('recipes-shop-start')?.value;
+    const end   = document.getElementById('recipes-shop-end')?.value;
+    if (!start || !end) { showToast('Seleziona le date', 'warning'); return; }
+
+    const panel = document.getElementById('recipes-shopping-panel');
+    panel.innerHTML = '<div class="loading" style="padding:1.5rem;"><div class="spinner"></div><span>Generazione lista…</span></div>';
+
+    try {
+        const res = await api.get(`/shopping/generate.php?start=${start}&end=${end}`);
+        if (!res.success) {
+            panel.innerHTML = `<div class="alert alert-warning">${escapeHtml(res.message || 'Errore')}</div>`;
+            return;
+        }
+        if (!res.missing.length && !res.available.length) {
+            panel.innerHTML = `<div class="alert alert-info">${escapeHtml(res.message || 'Nessun ingrediente. Pianifica prima i pasti nella sezione Piano pasti.')}</div>`;
+            return;
+        }
+        panel.innerHTML = `
+            ${res.missing.length ? `<div class="shopping-section">
+                <div class="shopping-section-title missing">Da comprare (${res.missing.length})</div>
+                <ul class="shopping-ul">${res.missing.map(i=>`<li class="shopping-item missing">${escapeHtml(i)}</li>`).join('')}</ul>
+            </div>` : ''}
+            ${res.available.length ? `<div class="shopping-section">
+                <div class="shopping-section-title available">Già in dispensa (${res.available.length})</div>
+                <ul class="shopping-ul">${res.available.map(i=>`<li class="shopping-item available">${escapeHtml(i)}</li>`).join('')}</ul>
+            </div>` : ''}`;
+    } catch {
+        panel.innerHTML = '<div class="alert alert-warning">Errore nella generazione della lista.</div>';
+    }
 }
 
 // ============================================================

@@ -1692,6 +1692,32 @@ input:checked + .toggle-slider::before {
     box-shadow: 0 2px 8px rgba(22,163,74,0.35);
 }
 
+/* ---------- Lista spesa (meals + recipes) ---------- */
+.shopping-section { margin-bottom: 1.25rem; }
+.shopping-section-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+.shopping-section-title.missing  { color: var(--danger); }
+.shopping-section-title.available { color: var(--success); }
+.shopping-ul { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0; padding: 0; }
+.shopping-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-full);
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+.shopping-item.missing  { background: var(--danger-bg);  color: #991b1b; }
+.shopping-item.available { background: var(--success-bg); color: #14532d; }
+
 /* Alias per retrocompatibilità scanner.html */
 .scanner-tabs { display: flex; background: rgba(255,255,255,0.5); border-radius: var(--radius-full); padding: 5px; gap: 4px; margin-bottom: 1.75rem; width: fit-content; border: 1px solid rgba(255,255,255,0.8); }
 .scanner-tab  { padding: 0.55rem 1.4rem; background: transparent; border: none; border-radius: var(--radius-full); font-size: 0.9rem; font-weight: 600; color: var(--text-light); cursor: pointer; transition: all var(--transition-med); }

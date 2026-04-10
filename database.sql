@@ -92,6 +92,25 @@ CREATE TABLE IF NOT EXISTS saved_recipes (
 -- ============================================================
 
 -- ============================================================
+-- Piano pasti (meal_plans)
+-- ============================================================
+CREATE TABLE IF NOT EXISTS meal_plans (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    user_id     INT NOT NULL,
+    date        DATE NOT NULL,
+    meal_type   ENUM('colazione','pranzo','cena') NOT NULL,
+    title       VARCHAR(255) NOT NULL,
+    notes       TEXT DEFAULT NULL,
+    ingredients TEXT DEFAULT NULL,        -- JSON: ["pasta","pomodoro","basilico"]
+    recipe_id   INT DEFAULT NULL,         -- ID Spoonacular (opzionale)
+    recipe_name VARCHAR(255) DEFAULT NULL,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    INDEX idx_user_date (user_id, date)
+) ENGINE=InnoDB;
+
+-- ============================================================
 -- Relazioni tra le tabelle:
 --
 -- users (1) ——< pantry_items (N) : un utente ha molti prodotti in dispensa
