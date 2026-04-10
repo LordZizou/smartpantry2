@@ -368,10 +368,17 @@ async function searchRecipesInModal() {
         }
         resultsDiv.innerHTML = res.recipes.map(r => `
             <div class="recipe-search-item"
-                 onclick="selectRecipeForMeal(${r.id}, ${JSON.stringify(escapeHtml(r.title))})">
+                 data-recipe-id="${r.id}"
+                 data-recipe-title="${escapeHtml(r.title)}">
                 <img src="${escapeHtml(r.image || '')}" onerror="this.style.display='none'" alt="">
                 <span>${escapeHtml(r.title)}</span>
             </div>`).join('');
+
+        resultsDiv.querySelectorAll('.recipe-search-item').forEach(el => {
+            el.addEventListener('click', () => {
+                selectRecipeForMeal(parseInt(el.dataset.recipeId), el.dataset.recipeTitle);
+            });
+        });
     } catch {
         resultsDiv.innerHTML = '<p style="color:var(--danger); font-size:0.85rem;">Errore nella ricerca.</p>';
     }
