@@ -136,45 +136,44 @@
 </head>
 <body>
 
-<div class="sidebar-overlay" id="sidebar-overlay"></div>
-
-<div class="app-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <span class="logo-icon">🥦</span>
-            <h2>Smart Pantry</h2>
+<nav class="drawer" id="drawer">
+    <div class="drawer-header">
+        <div class="drawer-brand">
+            <div class="brand-mark"></div>
+            <span>Smart Pantry</span>
         </div>
-        <nav class="sidebar-nav">
-            <a href="dashboard.html" class="nav-item active"><span class="nav-icon">🏠</span> Dashboard</a>
-            <a href="pantry.html"    class="nav-item"><span class="nav-icon">📦</span> La mia dispensa</a>
-            <a href="scanner.html"   class="nav-item"><span class="nav-icon">📷</span> Scanner barcode</a>
-            <a href="recipes.html"   class="nav-item"><span class="nav-icon">🍽️</span> Ricette consigliate</a>
-        </nav>
-        <div class="sidebar-footer">
-            <div class="sidebar-user">
-                <div class="user-avatar" id="sidebar-avatar">U</div>
-                <div class="user-info">
-                    <div class="user-name"  id="sidebar-username">Utente</div>
-                    <div class="user-email">Smart Pantry</div>
-                </div>
-            </div>
-            <button class="btn btn-secondary btn-sm btn-full" id="btn-logout">Esci</button>
+        <button class="drawer-close" id="drawer-close">&times;</button>
+    </div>
+    <div class="drawer-nav">
+        <a href="dashboard.html" class="nav-link active">Dashboard</a>
+        <a href="pantry.html"    class="nav-link">Dispensa</a>
+        <a href="scanner.html"   class="nav-link">Aggiungi prodotto</a>
+        <a href="recipes.html"   class="nav-link">Ricette</a>
+    </div>
+    <div class="drawer-footer">
+        <div class="user-chip">
+            <div class="user-avatar" id="sidebar-avatar">U</div>
+            <span class="user-name" id="sidebar-username">Utente</span>
         </div>
-    </aside>
+        <button class="btn btn-ghost btn-sm" id="btn-logout">Esci</button>
+    </div>
+</nav>
+<div class="drawer-overlay" id="drawer-overlay"></div>
 
-    <div class="main-content">
-        <header class="topbar">
-            <button class="hamburger" id="hamburger">☰</button>
-            <h1 class="topbar-title">Dashboard</h1>
-        </header>
+<div class="app">
+    <header class="topbar">
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+        <h1 class="page-title">Dashboard</h1>
+    </header>
 
         <main class="page-content">
 
             <!-- Benvenuto + data -->
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:1.25rem; flex-wrap:wrap; gap:0.5rem;">
                 <div>
-                    <h2 style="font-size:1.35rem; font-weight:800;">Ciao, <span id="welcome-name">…</span>! 👋</h2>
+                    <h2 style="font-size:1.35rem; font-weight:800;">Ciao, <span id="welcome-name">…</span>!</h2>
                     <p style="color:var(--text-light); font-size:0.88rem;" id="dashboard-date"></p>
                 </div>
                 <a href="pantry.html" class="btn btn-primary btn-sm">+ Aggiungi prodotto</a>
@@ -183,28 +182,28 @@
             <!-- Statistiche -->
             <div class="stats-grid" style="margin-bottom:1.5rem;">
                 <div class="stat-card">
-                    <div class="stat-icon green">📦</div>
+                    <div class="stat-orb green"></div>
                     <div class="stat-info">
                         <div class="stat-value" id="stat-total">—</div>
                         <div class="stat-label">Prodotti in dispensa</div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon blue">✅</div>
+                    <div class="stat-orb blue"></div>
                     <div class="stat-info">
                         <div class="stat-value" id="stat-ok">—</div>
                         <div class="stat-label">Prodotti OK</div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon yellow">⚠️</div>
+                    <div class="stat-orb amber"></div>
                     <div class="stat-info">
                         <div class="stat-value" id="stat-expiring">—</div>
                         <div class="stat-label">In scadenza (7 gg)</div>
                     </div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-icon red">❌</div>
+                    <div class="stat-orb red"></div>
                     <div class="stat-info">
                         <div class="stat-value" id="stat-expired">—</div>
                         <div class="stat-label">Scaduti</div>
@@ -218,7 +217,6 @@
                 <!-- Colonna 1: Ingredienti in dispensa -->
                 <div class="card">
                     <div class="card-header">
-                        <span>🥕</span>
                         <span class="card-title">Ingredienti in dispensa</span>
                         <a href="pantry.html" style="font-size:0.8rem; color:var(--primary);">Gestisci →</a>
                     </div>
@@ -238,7 +236,6 @@
                 <!-- Colonna 2: In scadenza -->
                 <div class="card">
                     <div class="card-header">
-                        <span>⏰</span>
                         <span class="card-title">In scadenza</span>
                         <a href="pantry.html#expiring" style="font-size:0.8rem; color:var(--primary);">Tutti →</a>
                     </div>
@@ -253,7 +250,6 @@
                 <!-- Colonna 3: Ricette consigliate preview -->
                 <div class="card col-recipes">
                     <div class="card-header">
-                        <span>🍽️</span>
                         <span class="card-title">Ricette per te</span>
                         <a href="recipes.html" style="font-size:0.8rem; color:var(--primary);">Vedi tutte →</a>
                     </div>
@@ -270,7 +266,6 @@
 
             </div>
         </main>
-    </div>
 </div>
 
 <script src="js/api.js"></script>

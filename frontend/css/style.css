@@ -165,156 +165,173 @@ input, select, textarea {
     border-bottom-color: var(--primary);
 }
 
-/* ---------- Layout principale (app) ---------- */
-.app-layout {
-    display: flex;
-    min-height: 100vh;
-}
-
-/* ---------- Sidebar navigazione ---------- */
-.sidebar {
+/* ---------- Drawer navigazione (hamburger) ---------- */
+.drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
     width: var(--nav-width);
     background: var(--green-900);
     color: var(--white);
     display: flex;
     flex-direction: column;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    z-index: 100;
-    transition: transform var(--transition);
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.25);
 }
 
-.sidebar-logo {
-    padding: 1.5rem 1.25rem;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
+.drawer.open {
+    transform: translateX(0);
+}
+
+.drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.32s ease;
+    backdrop-filter: blur(2px);
+}
+
+.drawer-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.25rem 1.25rem 1.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
     background: rgba(0,0,0,0.15);
+}
+
+.drawer-brand {
     display: flex;
     align-items: center;
     gap: 0.75rem;
 }
 
-.sidebar-logo .logo-icon {
-    font-size: 1.8rem;
+.brand-mark {
+    width: 32px;
+    height: 32px;
+    background: var(--primary-light);
+    border-radius: 8px;
+    flex-shrink: 0;
 }
 
-.sidebar-logo h2 {
-    font-size: 1.1rem;
+.drawer-brand span {
+    font-size: 1.05rem;
     font-weight: 700;
     color: var(--white);
 }
 
-.sidebar-nav {
+.drawer-close {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.6);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 6px;
+    transition: color var(--transition), background var(--transition);
+}
+
+.drawer-close:hover {
+    color: var(--white);
+    background: rgba(255,255,255,0.1);
+}
+
+.drawer-nav {
     flex: 1;
     padding: 1rem 0;
     overflow-y: auto;
 }
 
-.nav-item {
+.nav-link {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.85rem 1.25rem;
-    color: rgba(255,255,255,0.75);
+    padding: 0.85rem 1.5rem;
+    color: rgba(255,255,255,0.72);
     font-size: 0.95rem;
     font-weight: 500;
-    transition: all var(--transition);
-    border-left: 3px solid transparent;
     text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: all var(--transition);
 }
 
-.nav-item:hover {
+.nav-link:hover {
     background: rgba(255,255,255,0.08);
     color: var(--white);
     text-decoration: none;
 }
 
-.nav-item.active {
+.nav-link.active {
     background: rgba(255,255,255,0.12);
     color: var(--white);
     border-left-color: var(--primary-light);
+    font-weight: 600;
 }
 
-.nav-item .nav-icon {
-    font-size: 1.2rem;
-    width: 1.5rem;
-    text-align: center;
-    flex-shrink: 0;
-}
-
-.nav-badge {
-    margin-left: auto;
-    background: var(--danger);
-    color: white;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 0.15rem 0.45rem;
-    border-radius: var(--radius-full);
-    min-width: 1.25rem;
-    text-align: center;
-}
-
-.sidebar-footer {
+.drawer-footer {
     padding: 1rem 1.25rem;
     border-top: 1px solid rgba(255,255,255,0.1);
-}
-
-.sidebar-user {
     display: flex;
     align-items: center;
+    justify-content: space-between;
     gap: 0.75rem;
-    margin-bottom: 0.75rem;
+}
+
+.user-chip {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-width: 0;
 }
 
 .user-avatar {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     background: var(--primary-light);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: white;
     flex-shrink: 0;
 }
 
-.user-info {
-    flex: 1;
-    min-width: 0;
-}
-
 .user-name {
+    font-size: 0.88rem;
     font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--white);
+    color: rgba(255,255,255,0.85);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.user-email {
-    font-size: 0.75rem;
-    color: rgba(255,255,255,0.55);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* ---------- Contenuto principale ---------- */
-.main-content {
-    margin-left: var(--nav-width);
-    flex: 1;
+/* ---------- Layout principale (senza sidebar fissa) ---------- */
+.app {
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
 }
+
+/* Compatibilità con vecchio .app-layout + .main-content */
+.app-layout { display: flex; min-height: 100vh; }
+.main-content { margin-left: var(--nav-width); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
 
 .topbar {
     height: var(--topbar-height);
-    background: var(--green-100);
+    background: var(--white);
     border-bottom: 1px solid var(--green-150);
     display: flex;
     align-items: center;
@@ -325,11 +342,24 @@ input, select, textarea {
     gap: 1rem;
 }
 
+.page-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    flex: 1;
+}
+
 .topbar-title {
     font-size: 1.2rem;
     font-weight: 700;
     color: var(--text);
     flex: 1;
+}
+
+.topbar-end {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
 }
 
 .topbar-actions {
@@ -343,15 +373,61 @@ input, select, textarea {
     flex: 1;
 }
 
-/* ---------- Hamburger (mobile) ---------- */
+/* ---------- Hamburger (3 linee CSS) ---------- */
 .hamburger {
-    display: none;
+    width: 40px;
+    height: 40px;
     background: none;
     border: none;
-    font-size: 1.5rem;
+    border-radius: 8px;
     cursor: pointer;
-    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0;
+    flex-shrink: 0;
+    transition: background var(--transition);
 }
+
+.hamburger span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: var(--text);
+    border-radius: 2px;
+    transition: all var(--transition);
+}
+
+.hamburger:hover {
+    background: var(--green-100);
+}
+
+/* ---------- Bottone ghost (drawer logout) ---------- */
+.btn-ghost {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.8);
+}
+
+.btn-ghost:hover {
+    background: rgba(255,255,255,0.16);
+    color: var(--white);
+}
+
+/* ---------- Stat orb (icone statistiche senza emoji) ---------- */
+.stat-orb {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+
+.stat-orb.green  { background: linear-gradient(135deg, #4ade80, #16a34a); }
+.stat-orb.amber  { background: linear-gradient(135deg, #fbbf24, #d97706); }
+.stat-orb.red    { background: linear-gradient(135deg, #f87171, #dc2626); }
+.stat-orb.blue   { background: linear-gradient(135deg, #60a5fa, #2563eb); }
 
 /* ---------- Componenti UI ---------- */
 
@@ -1193,20 +1269,8 @@ input:checked + .toggle-slider::before {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .sidebar {
-        transform: translateX(-100%);
-    }
-
-    .sidebar.open {
-        transform: translateX(0);
-    }
-
     .main-content {
         margin-left: 0;
-    }
-
-    .hamburger {
-        display: block;
     }
 
     .pantry-grid {
@@ -1244,7 +1308,7 @@ input:checked + .toggle-slider::before {
     }
 }
 
-/* Overlay mobile sidebar */
+/* Overlay sidebar legacy (non usato nelle nuove pagine) */
 .sidebar-overlay {
     display: none;
     position: fixed;

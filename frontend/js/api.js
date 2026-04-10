@@ -195,22 +195,38 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// ---- Sidebar mobile ----
+// ---- Drawer navigazione ----
 
 function initSidebar() {
+    initDrawer();
+}
+
+function initDrawer() {
     const hamburger = document.getElementById('hamburger');
-    const sidebar   = document.getElementById('sidebar');
-    const overlay   = document.getElementById('sidebar-overlay');
+    const drawer    = document.getElementById('drawer');
+    const overlay   = document.getElementById('drawer-overlay');
+    const closeBtn  = document.getElementById('drawer-close');
 
-    if (!hamburger || !sidebar) return;
+    if (!hamburger || !drawer) return;
 
-    hamburger.addEventListener('click', () => {
-        sidebar.classList.toggle('open');
-        overlay?.classList.toggle('active');
-    });
+    function openDrawer() {
+        drawer.classList.add('open');
+        overlay?.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
 
-    overlay?.addEventListener('click', () => {
-        sidebar.classList.remove('open');
-        overlay.classList.remove('active');
+    function closeDrawer() {
+        drawer.classList.remove('open');
+        overlay?.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    hamburger.addEventListener('click', openDrawer);
+    closeBtn?.addEventListener('click', closeDrawer);
+    overlay?.addEventListener('click', closeDrawer);
+
+    // Chiudi il drawer con Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeDrawer();
     });
 }
