@@ -6,52 +6,53 @@
 /* ---------- Variabili colore e tema ---------- */
 :root {
     /* Palette verde principale */
-    --primary:        #1f7a40;
-    --primary-dark:   #145a2c;
-    --primary-light:  #37a05e;
-    --primary-bg:     #d4eddb;
+    --primary:        #16a34a;
+    --primary-dark:   #15803d;
+    --primary-light:  #22c55e;
+    --primary-bg:     #dcfce7;
 
-    /* Sfumature tono neutro/slate per i background */
-    --green-50:       #f0f4f0;   /* sfondo pagina principale */
-    --green-100:      #e4ebe4;   /* sfondo secondario */
-    --green-150:      #ccd9cc;   /* bordi, separatori */
-    --green-200:      #adc2ad;   /* accenti leggeri */
-    --green-300:      #7a9e7a;
-    --green-700:      #1a6635;
-    --green-900:      #0e3d1e;   /* sidebar scura */
+    /* Sfumature background */
+    --green-50:       #f0fdf4;
+    --green-100:      #dcfce7;
+    --green-150:      #bbf7d0;
+    --green-200:      #86efac;
+    --green-300:      #4ade80;
+    --green-700:      #15803d;
+    --green-900:      #14532d;   /* drawer scuro */
 
-    --accent:         #ff6b35;
-    --warning:        #f59800;
-    --warning-bg:     #fff3cd;
-    --danger:         #e53935;
-    --danger-bg:      #ffebee;
-    --success:        #2e7d32;
-    --success-bg:     #e8f5e9;
-    --info:           #1565c0;
-    --info-bg:        #e3f2fd;
+    --accent:         #f97316;
+    --warning:        #f59e0b;
+    --warning-bg:     #fffbeb;
+    --danger:         #ef4444;
+    --danger-bg:      #fef2f2;
+    --success:        #22c55e;
+    --success-bg:     #f0fdf4;
+    --info:           #3b82f6;
+    --info-bg:        #eff6ff;
 
-    --text:           #1a2e1e;
-    --text-light:     #4a6551;
-    --text-muted:     #8aaa91;
-    --border:         #b8d9c0;
-    --border-light:   #daf0df;
+    --text:           #0f172a;
+    --text-light:     #475569;
+    --text-muted:     #94a3b8;
+    --border:         #e2e8f0;
+    --border-light:   #f1f5f9;
     --white:          #ffffff;
-    --bg:             #f0f4f0;    /* sfondo principale verde salvia neutro */
-    --bg-2:           #e4ebe4;    /* sfondo leggermente più scuro */
+    --bg:             #f8fafc;
+    --bg-2:           #f1f5f9;
 
-    --shadow-sm:      0 1px 3px rgba(0,0,0,0.08);
-    --shadow:         0 2px 8px rgba(0,0,0,0.10);
-    --shadow-md:      0 4px 16px rgba(0,0,0,0.12);
-    --shadow-lg:      0 8px 32px rgba(0,0,0,0.15);
+    --shadow-sm:      0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow:         0 4px 12px rgba(0,0,0,0.07), 0 1px 3px rgba(0,0,0,0.05);
+    --shadow-md:      0 8px 24px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.05);
+    --shadow-lg:      0 20px 40px rgba(0,0,0,0.12), 0 6px 12px rgba(0,0,0,0.06);
 
-    --radius-sm:      6px;
-    --radius:         10px;
-    --radius-lg:      16px;
+    --radius-sm:      10px;
+    --radius:         16px;
+    --radius-lg:      22px;
     --radius-full:    9999px;
 
-    --nav-width:      240px;
-    --topbar-height:  60px;
+    --nav-width:      256px;
+    --topbar-height:  64px;
     --transition:     0.2s ease;
+    --transition-med: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ---------- Reset e base ---------- */
@@ -69,9 +70,27 @@ html {
 body {
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     background: var(--bg);
+    background-image:
+        radial-gradient(ellipse 80% 60% at 20% -5%, rgba(34,197,94,0.10) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 85% 110%, rgba(59,130,246,0.06) 0%, transparent 55%);
+    background-attachment: fixed;
     color: var(--text);
     line-height: 1.6;
     min-height: 100vh;
+}
+
+/* ---------- Animazioni ---------- */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to   { opacity: 1; transform: scale(1); }
 }
 
 a {
@@ -331,8 +350,11 @@ input, select, textarea {
 
 .topbar {
     height: var(--topbar-height);
-    background: var(--white);
-    border-bottom: 1px solid var(--green-150);
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(255,255,255,0.6);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.05);
     display: flex;
     align-items: center;
     padding: 0 1.5rem;
@@ -437,59 +459,65 @@ input, select, textarea {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    padding: 0.6rem 1.25rem;
+    padding: 0.6rem 1.35rem;
     border: none;
-    border-radius: var(--radius);
+    border-radius: var(--radius-full);
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all var(--transition);
+    transition: all var(--transition-med);
     text-decoration: none;
     white-space: nowrap;
+    letter-spacing: 0.01em;
 }
 
 .btn:hover {
     text-decoration: none;
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-sm);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
 }
 
 .btn:active {
     transform: translateY(0);
+    box-shadow: none;
 }
 
 .btn-primary {
-    background: var(--primary);
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-dark));
     color: white;
+    box-shadow: 0 2px 8px rgba(22,163,74,0.30);
 }
 
 .btn-primary:hover {
-    background: var(--primary-dark);
+    background: linear-gradient(135deg, #34d572, var(--primary));
     color: white;
+    box-shadow: 0 4px 16px rgba(22,163,74,0.40);
 }
 
 .btn-secondary {
+    background: var(--bg-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.btn-secondary:hover {
     background: var(--border);
     color: var(--text);
 }
 
-.btn-secondary:hover {
-    background: #d0d0d0;
-    color: var(--text);
-}
-
 .btn-danger {
-    background: var(--danger);
+    background: linear-gradient(135deg, #f87171, #dc2626);
     color: white;
+    box-shadow: 0 2px 8px rgba(239,68,68,0.25);
 }
 
 .btn-danger:hover {
-    background: #c62828;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
     color: white;
 }
 
 .btn-warning {
-    background: var(--warning);
+    background: linear-gradient(135deg, #fbbf24, #d97706);
     color: white;
 }
 
@@ -505,12 +533,12 @@ input, select, textarea {
 }
 
 .btn-sm {
-    padding: 0.4rem 0.85rem;
+    padding: 0.38rem 0.9rem;
     font-size: 0.82rem;
 }
 
 .btn-lg {
-    padding: 0.85rem 1.75rem;
+    padding: 0.85rem 2rem;
     font-size: 1rem;
 }
 
@@ -519,7 +547,7 @@ input, select, textarea {
 }
 
 .btn:disabled {
-    opacity: 0.6;
+    opacity: 0.55;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
@@ -528,18 +556,26 @@ input, select, textarea {
 /* Card */
 .card {
     background: var(--white);
-    border-radius: var(--radius);
-    box-shadow: 0 1px 4px rgba(31,122,64,0.08), 0 0 0 1px rgba(31,122,64,0.06);
-    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255,255,255,0.8);
     overflow: hidden;
+    transition: transform var(--transition-med), box-shadow var(--transition-med);
+    animation: fadeInUp 0.45s ease both;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
 
 .card-header {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--border);
+    padding: 1.1rem 1.4rem;
+    border-bottom: 1px solid var(--border-light);
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    background: linear-gradient(to right, rgba(248,250,252,0.8), rgba(255,255,255,0));
 }
 
 .card-title {
@@ -563,13 +599,20 @@ input, select, textarea {
 
 .stat-card {
     background: var(--white);
-    border-radius: var(--radius);
-    padding: 1.25rem;
-    box-shadow: 0 1px 4px rgba(31,122,64,0.08);
-    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: 1.35rem 1.5rem;
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255,255,255,0.8);
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.1rem;
+    transition: transform var(--transition-med), box-shadow var(--transition-med);
+    animation: fadeInUp 0.45s ease both;
+}
+
+.stat-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
 }
 
 .stat-icon {
@@ -620,9 +663,9 @@ input, select, textarea {
 
 .form-control {
     width: 100%;
-    padding: 0.65rem 0.9rem;
+    padding: 0.7rem 1rem;
     border: 1.5px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     font-size: 0.95rem;
     color: var(--text);
     background: var(--white);
@@ -722,27 +765,28 @@ input, select, textarea {
 /* Card prodotto */
 .product-card {
     background: var(--white);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255,255,255,0.8);
     overflow: hidden;
-    transition: box-shadow var(--transition), transform var(--transition);
+    transition: box-shadow var(--transition-med), transform var(--transition-med);
     display: flex;
     flex-direction: column;
+    animation: fadeInUp 0.4s ease both;
 }
 
 .product-card:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    transform: translateY(-4px);
 }
 
 .product-card.expiring {
-    border-left: 3px solid var(--warning);
+    border-top: 3px solid var(--warning);
 }
 
 .product-card.expired {
-    border-left: 3px solid var(--danger);
-    opacity: 0.85;
+    border-top: 3px solid var(--danger);
+    opacity: 0.82;
 }
 
 .product-image {
@@ -756,7 +800,7 @@ input, select, textarea {
 .product-image-placeholder {
     width: 100%;
     height: 140px;
-    background: var(--primary-bg);
+    background: linear-gradient(135deg, var(--primary-bg), #e0f2fe);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -899,18 +943,19 @@ input, select, textarea {
 
 .recipe-card {
     background: var(--white);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
+    border: 1px solid rgba(255,255,255,0.8);
     overflow: hidden;
-    transition: box-shadow var(--transition), transform var(--transition);
+    transition: box-shadow var(--transition-med), transform var(--transition-med);
     display: flex;
     flex-direction: column;
+    animation: fadeInUp 0.4s ease both;
 }
 
 .recipe-card:hover {
     box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
+    transform: translateY(-5px);
 }
 
 .recipe-image {
@@ -1025,7 +1070,9 @@ input, select, textarea {
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.45);
+    background: rgba(15,23,42,0.50);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1033,7 +1080,7 @@ input, select, textarea {
     padding: 1rem;
     opacity: 0;
     pointer-events: none;
-    transition: opacity var(--transition);
+    transition: opacity 0.25s ease;
 }
 
 .modal-overlay.active {
@@ -1049,12 +1096,12 @@ input, select, textarea {
     max-width: 520px;
     max-height: 90vh;
     overflow-y: auto;
-    transform: translateY(20px);
-    transition: transform var(--transition);
+    transform: translateY(24px) scale(0.98);
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
 }
 
 .modal-overlay.active .modal {
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
 }
 
 .modal-header {
@@ -1584,3 +1631,23 @@ input:checked + .toggle-slider::before {
     height: 4px;
     background: var(--cat-text, var(--primary));
 }
+
+/* ---------- Animazione a cascata per le griglia ---------- */
+.pantry-grid .product-card:nth-child(1)  { animation-delay: 0.00s; }
+.pantry-grid .product-card:nth-child(2)  { animation-delay: 0.05s; }
+.pantry-grid .product-card:nth-child(3)  { animation-delay: 0.10s; }
+.pantry-grid .product-card:nth-child(4)  { animation-delay: 0.15s; }
+.pantry-grid .product-card:nth-child(5)  { animation-delay: 0.20s; }
+.pantry-grid .product-card:nth-child(6)  { animation-delay: 0.25s; }
+.pantry-grid .product-card:nth-child(n+7) { animation-delay: 0.30s; }
+
+.stats-grid .stat-card:nth-child(1) { animation-delay: 0.00s; }
+.stats-grid .stat-card:nth-child(2) { animation-delay: 0.07s; }
+.stats-grid .stat-card:nth-child(3) { animation-delay: 0.14s; }
+.stats-grid .stat-card:nth-child(4) { animation-delay: 0.21s; }
+
+/* ---------- Spinner più moderno ---------- */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
