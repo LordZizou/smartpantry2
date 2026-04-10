@@ -1647,6 +1647,56 @@ input:checked + .toggle-slider::before {
 
 .step-line.done { background: var(--success); }
 
+/* ---------- Tab pillola globale (scanner, ricette, ecc.) ---------- */
+.page-intro {
+    margin-bottom: 1.75rem;
+}
+.page-intro h2 {
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+}
+.page-intro p {
+    color: var(--text-light);
+    font-size: 0.95rem;
+}
+
+.pill-tabs {
+    display: flex;
+    background: rgba(255,255,255,0.5);
+    border-radius: var(--radius-full);
+    padding: 5px;
+    gap: 4px;
+    margin-bottom: 1.75rem;
+    width: fit-content;
+    border: 1px solid rgba(255,255,255,0.8);
+}
+
+.pill-tab {
+    padding: 0.55rem 1.4rem;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all var(--transition-med);
+    white-space: nowrap;
+}
+
+.pill-tab.active {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(22,163,74,0.35);
+}
+
+/* Alias per retrocompatibilità scanner.html */
+.scanner-tabs { display: flex; background: rgba(255,255,255,0.5); border-radius: var(--radius-full); padding: 5px; gap: 4px; margin-bottom: 1.75rem; width: fit-content; border: 1px solid rgba(255,255,255,0.8); }
+.scanner-tab  { padding: 0.55rem 1.4rem; background: transparent; border: none; border-radius: var(--radius-full); font-size: 0.9rem; font-weight: 600; color: var(--text-light); cursor: pointer; transition: all var(--transition-med); }
+.scanner-tab.active { background: var(--primary); color: #fff; box-shadow: 0 2px 8px rgba(22,163,74,0.35); }
+
 /* Select categoria con icona */
 .cat-select-option { padding-left: 0.5rem; }
 

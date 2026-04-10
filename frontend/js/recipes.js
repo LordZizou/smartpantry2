@@ -24,10 +24,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============================================================
 
 function initTabs() {
-    document.querySelectorAll('.recipes-tab').forEach(btn => {
+    document.querySelectorAll('.pill-tab').forEach(btn => {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.tab;
-            document.querySelectorAll('.recipes-tab').forEach(b => b.classList.toggle('active', b === btn));
+            document.querySelectorAll('.pill-tab').forEach(b => b.classList.toggle('active', b === btn));
             document.getElementById('section-suggested').style.display = tab === 'suggested' ? 'block' : 'none';
             document.getElementById('section-search').style.display    = tab === 'search'    ? 'block' : 'none';
         });
@@ -138,7 +138,7 @@ function quickSearch(query) {
 /** Effettua la ricerca e renderizza i risultati */
 async function searchRecipes(query) {
     // Mostra sezione ricerca
-    document.querySelectorAll('.recipes-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'search'));
+    document.querySelectorAll('.pill-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'search'));
     document.getElementById('section-suggested').style.display = 'none';
     document.getElementById('section-search').style.display    = 'block';
 

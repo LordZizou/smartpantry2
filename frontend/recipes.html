@@ -50,14 +50,16 @@
 
     <main class="page-content">
 
-        <!-- Tab: Consigliate / Cerca -->
-        <div class="recipes-tabs">
-            <button class="recipes-tab active" data-tab="suggested">
-                Consigliate
-            </button>
-            <button class="recipes-tab" data-tab="search">
-                Cerca ricetta
-            </button>
+        <!-- Intro -->
+        <div class="page-intro">
+            <h2>Le tue ricette</h2>
+            <p>Scopri ricette consigliate in base alla tua dispensa oppure cerca qualsiasi piatto.</p>
+        </div>
+
+        <!-- Tab pillola -->
+        <div class="pill-tabs">
+            <button class="pill-tab active" data-tab="suggested">Consigliate</button>
+            <button class="pill-tab" data-tab="search">Cerca ricetta</button>
         </div>
 
         <!-- ===== SEZIONE: RICETTE CONSIGLIATE ===== -->
@@ -80,21 +82,6 @@
             <!-- Statistiche risultati -->
             <div id="recipes-stats" class="stats-grid"></div>
 
-            <!-- Loader skeleton -->
-            <div id="recipes-loader" style="display:none;">
-                <div class="recipes-grid">
-                    ${[1,2,3,4,5,6].map(() => `
-                        <div class="recipe-skeleton">
-                            <div class="skeleton-img"></div>
-                            <div class="skeleton-body">
-                                <div class="skeleton-line"></div>
-                                <div class="skeleton-line short"></div>
-                                <div class="skeleton-line"></div>
-                            </div>
-                        </div>`).join('')}
-                </div>
-            </div>
-
             <!-- Griglia ricette -->
             <div class="recipes-grid" id="recipes-grid">
                 <div class="loading" style="grid-column:1/-1; padding:3rem;">
@@ -107,26 +94,33 @@
         <!-- ===== SEZIONE: CERCA RICETTA ===== -->
         <div id="section-search" class="hidden">
 
-            <!-- Barra di ricerca -->
-            <div style="display:flex; gap:0.6rem; margin-bottom:1.25rem;">
-                <input class="form-control" type="text" id="search-query"
-                       placeholder="Cerca una ricetta… es. pizza, pasta al pesto, tiramisù"
-                       autocomplete="off" style="flex:1;">
-                <button id="btn-search" class="btn btn-primary">Cerca</button>
-            </div>
+            <div class="card" style="margin-bottom:1.25rem;">
+                <div class="card-header">
+                    <span class="card-title">Cerca una ricetta</span>
+                </div>
+                <div class="card-body">
+                    <!-- Barra di ricerca -->
+                    <div style="display:flex; gap:0.6rem; margin-bottom:1rem;">
+                        <input class="form-control" type="text" id="search-query"
+                               placeholder="es. pizza, pasta al pesto, tiramisù…"
+                               autocomplete="off" style="flex:1;">
+                        <button id="btn-search" class="btn btn-primary">Cerca</button>
+                    </div>
 
-            <!-- Suggerimenti rapidi -->
-            <div id="search-suggestions" style="margin-bottom:1.25rem;">
-                <p style="font-size:0.82rem; color:var(--text-light); margin-bottom:0.5rem;">Cerca ad esempio:</p>
-                <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
-                    <button class="filter-btn" onclick="quickSearch('pizza')">pizza</button>
-                    <button class="filter-btn" onclick="quickSearch('pasta')">pasta</button>
-                    <button class="filter-btn" onclick="quickSearch('risotto')">risotto</button>
-                    <button class="filter-btn" onclick="quickSearch('pollo')">pollo</button>
-                    <button class="filter-btn" onclick="quickSearch('insalata')">insalata</button>
-                    <button class="filter-btn" onclick="quickSearch('dolce')">dolce</button>
-                    <button class="filter-btn" onclick="quickSearch('zuppa')">zuppa</button>
-                    <button class="filter-btn" onclick="quickSearch('frittata')">frittata</button>
+                    <!-- Suggerimenti rapidi -->
+                    <div id="search-suggestions">
+                        <p style="font-size:0.82rem; color:var(--text-light); margin-bottom:0.5rem;">Cerca ad esempio:</p>
+                        <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">
+                            <button class="filter-btn" onclick="quickSearch('pizza')">pizza</button>
+                            <button class="filter-btn" onclick="quickSearch('pasta')">pasta</button>
+                            <button class="filter-btn" onclick="quickSearch('risotto')">risotto</button>
+                            <button class="filter-btn" onclick="quickSearch('pollo')">pollo</button>
+                            <button class="filter-btn" onclick="quickSearch('insalata')">insalata</button>
+                            <button class="filter-btn" onclick="quickSearch('dolce')">dolce</button>
+                            <button class="filter-btn" onclick="quickSearch('zuppa')">zuppa</button>
+                            <button class="filter-btn" onclick="quickSearch('frittata')">frittata</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
