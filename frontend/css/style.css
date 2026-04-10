@@ -11,12 +11,12 @@
     --primary-light:  #37a05e;
     --primary-bg:     #d4eddb;
 
-    /* Sfumature di verde per i background */
-    --green-50:       #eaf6ee;   /* sfondo pagina principale */
-    --green-100:      #d4edda;   /* sfondo secondario */
-    --green-150:      #c0e3c8;   /* bordi, separatori */
-    --green-200:      #a3d4ae;   /* accenti leggeri */
-    --green-300:      #71b882;
+    /* Sfumature tono neutro/slate per i background */
+    --green-50:       #f0f4f0;   /* sfondo pagina principale */
+    --green-100:      #e4ebe4;   /* sfondo secondario */
+    --green-150:      #ccd9cc;   /* bordi, separatori */
+    --green-200:      #adc2ad;   /* accenti leggeri */
+    --green-300:      #7a9e7a;
     --green-700:      #1a6635;
     --green-900:      #0e3d1e;   /* sidebar scura */
 
@@ -36,8 +36,8 @@
     --border:         #b8d9c0;
     --border-light:   #daf0df;
     --white:          #ffffff;
-    --bg:             #eaf6ee;    /* sfondo principale verde chiaro */
-    --bg-2:           #dff2e5;    /* sfondo leggermente più scuro */
+    --bg:             #f0f4f0;    /* sfondo principale verde salvia neutro */
+    --bg-2:           #e4ebe4;    /* sfondo leggermente più scuro */
 
     --shadow-sm:      0 1px 3px rgba(0,0,0,0.08);
     --shadow:         0 2px 8px rgba(0,0,0,0.10);
