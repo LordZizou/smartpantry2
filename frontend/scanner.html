@@ -145,26 +145,21 @@
                     </div>
                 </div>
 
-                <!-- Colonna destra: barcode manuale + risultato -->
-                <div>
-                    <div class="card" style="margin-bottom:1rem;">
-                        <div class="card-header">
-                            <span class="card-title">Inserisci barcode manualmente</span>
-                        </div>
-                        <div class="card-body">
-                            <form id="form-manual-barcode">
-                                <div class="barcode-input-row">
-                                    <input class="form-control" type="text" id="manual-barcode"
-                                           placeholder="es. 8001234567890"
-                                           pattern="[0-9A-Za-z\-]{4,20}">
-                                    <button type="submit" class="btn btn-primary">Cerca</button>
-                                </div>
-                            </form>
-                        </div>
+                <!-- Colonna destra: barcode manuale -->
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Inserisci barcode manualmente</span>
                     </div>
-
-                    <!-- Risultato prodotto barcode -->
-                    <div id="result-section" class="hidden"></div>
+                    <div class="card-body">
+                        <form id="form-manual-barcode">
+                            <div class="barcode-input-row">
+                                <input class="form-control" type="text" id="manual-barcode"
+                                       placeholder="es. 8001234567890"
+                                       pattern="[0-9A-Za-z\-]{4,20}">
+                                <button type="submit" class="btn btn-primary">Cerca</button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
 
             </div>
@@ -192,6 +187,9 @@
                 </div>
             </div>
         </div>
+
+        <!-- ===== RISULTATO PRODOTTO — sempre visibile, fuori da entrambe le sezioni ===== -->
+        <div id="result-section" class="hidden" style="margin-top:1.5rem;"></div>
 
     </main>
 </div>
