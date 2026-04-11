@@ -14,6 +14,7 @@
 require_once __DIR__ . '/../../includes/cors_headers.php';
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/auth_check.php';
+require_once __DIR__ . '/../../includes/spoonacular.php';
 
 setJsonHeaders();
 requireAuth();
@@ -41,42 +42,18 @@ $stmt = $pdo->prepare('SELECT DISTINCT LOWER(TRIM(name)) AS name FROM pantry_ite
 $stmt->execute([$userId]);
 $pantryIngredients = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-// Costruisci la URL per Spoonacular complexSearch
+// Chiama Spoonacular complexSearch con fallback automatico tra le chiavi
 // NON usiamo includeIngredients: vogliamo tutte le ricette con quel nome,
 // poi confrontiamo manualmente con la dispensa per calcolare la compatibilità.
-// Questo permette di cercare qualsiasi ricetta anche con 0 ingredienti disponibili.
-$params = http_build_query([
-    'apiKey'               => SPOONACULAR_API_KEY,
+$data = spoonacularGet('/recipes/complexSearch', [
     'query'                => $query,
     'number'               => $number,
     'instructionsRequired' => 'true',
     'addRecipeInformation' => 'false',
 ]);
 
-$url     = SPOONACULAR_URL . '/recipes/complexSearch?' . $params;
-$context = stream_context_create([
-    'http' => [
-        'timeout'    => 15,
-        'user_agent' => 'SmartPantry/1.0',
-        'method'     => 'GET'
-    ]
-]);
-
-$response = @file_get_contents($url, false, $context);
-
-if ($response === false) {
-    jsonError('Impossibile contattare Spoonacular. Controlla la connessione.', 503);
-}
-
-$data = json_decode($response, true);
-
-// Controlla errori API
-if (isset($data['status']) && $data['status'] === 'failure') {
-    jsonError('Errore Spoonacular: ' . ($data['message'] ?? 'Errore sconosciuto'), 502);
-}
-
-if (!isset($data['results'])) {
-    jsonError('Risposta non valida da Spoonacular', 502);
+if ($data === null || !isset($data['results'])) {
+    jsonError('Impossibile contattare Spoonacular. Controlla la connessione o le chiavi API.', 503);
 }
 
 $results = $data['results'];
@@ -94,17 +71,15 @@ if (empty($results)) {
 // Passo 2: recupera gli ingredienti completi per ogni ricetta (bulk)
 $recipeIds = array_column($results, 'id');
 
-$bulkUrl     = SPOONACULAR_URL . '/recipes/informationBulk?ids=' . implode(',', $recipeIds) . '&apiKey=' . SPOONACULAR_API_KEY . '&includeNutrition=false';
-$bulkResponse = @file_get_contents($bulkUrl, false, $context);
+$bulkData = spoonacularGet('/recipes/informationBulk', [
+    'ids'              => implode(',', $recipeIds),
+    'includeNutrition' => 'false',
+]);
 
 $detailedRecipes = [];
-if ($bulkResponse !== false) {
-    $bulkData = json_decode($bulkResponse, true);
-    if (is_array($bulkData)) {
-        // Indicizza per ID
-        foreach ($bulkData as $recipe) {
-            $detailedRecipes[$recipe['id']] = $recipe;
-        }
+if (is_array($bulkData)) {
+    foreach ($bulkData as $recipe) {
+        $detailedRecipes[$recipe['id']] = $recipe;
     }
 }
 

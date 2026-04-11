@@ -5,6 +5,7 @@
 
 require_once __DIR__ . '/../../includes/cors_headers.php';
 require_once __DIR__ . '/../../includes/auth_check.php';
+require_once __DIR__ . '/../../includes/spoonacular.php';
 
 setJsonHeaders();
 requireAuth();
@@ -18,20 +19,12 @@ if (!$recipeId) {
     jsonError('ID ricetta non valido');
 }
 
-$apiKey = SPOONACULAR_API_KEY;
-$url    = SPOONACULAR_URL . "/recipes/{$recipeId}/information?apiKey={$apiKey}&includeNutrition=false";
-
-$ctx = stream_context_create(['http' => ['timeout' => 8]]);
-$response = @file_get_contents($url, false, $ctx);
-
-if ($response === false) {
-    jsonError('Impossibile contattare Spoonacular');
-}
-
-$data = json_decode($response, true);
+$data = spoonacularGet("/recipes/{$recipeId}/information", [
+    'includeNutrition' => 'false',
+]);
 
 if (!$data || (isset($data['status']) && $data['status'] === 'failure')) {
-    jsonError('Ricetta non trovata');
+    jsonError('Ricetta non trovata o chiavi API esaurite');
 }
 
 // Estrai i nomi degli ingredienti
