@@ -263,6 +263,48 @@ ${available.length? `<h2 class="available">Già in dispensa (${available.length}
     win.print();
 }
 
+/**
+ * Costruisce il pannello visivo dei valori nutrizionali con barre colorate.
+ * Usato da scanner.js e pantry.js.
+ * @param {object} product — oggetto con campi *_per_100g
+ * @returns {string} HTML del pannello (stringa vuota se nessun dato)
+ */
+function buildNutritionPanel(product) {
+    const nutrients = [
+        { key: 'calories_per_100g', label: 'Calorie',     unit: 'kcal', daily: 2000, color: '#f59e0b' },
+        { key: 'proteins_per_100g', label: 'Proteine',    unit: 'g',    daily: 50,   color: '#3b82f6' },
+        { key: 'carbs_per_100g',    label: 'Carboidrati', unit: 'g',    daily: 260,  color: '#8b5cf6' },
+        { key: 'fats_per_100g',     label: 'Grassi',      unit: 'g',    daily: 70,   color: '#ef4444' },
+        { key: 'fiber_per_100g',    label: 'Fibre',       unit: 'g',    daily: 25,   color: '#10b981' },
+        { key: 'salt_per_100g',     label: 'Sale',        unit: 'g',    daily: 6,    color: '#6b7280' },
+    ];
+
+    const rows = nutrients
+        .filter(n => product[n.key] != null)
+        .map(n => {
+            const val = parseFloat(product[n.key]);
+            const pct = Math.min(100, Math.round(val / n.daily * 100));
+            return `
+            <div class="nutrient-row">
+                <span class="nutrient-name">${n.label}</span>
+                <div class="nutrient-bar-wrap">
+                    <div class="nutrient-bar" style="width:${pct}%; background:${n.color};"></div>
+                </div>
+                <span class="nutrient-val">${val} ${n.unit}</span>
+                <span class="nutrient-pct">${pct}%</span>
+            </div>`;
+        }).join('');
+
+    if (!rows) return '';
+
+    return `
+        <div class="nutrition-panel">
+            <div class="nutrition-panel-title">Valori nutrizionali <small style="font-weight:400;color:var(--text-light);">per 100g</small></div>
+            ${rows}
+            <div class="nutrition-footnote">* % rispetto al fabbisogno giornaliero di riferimento (2000 kcal)</div>
+        </div>`;
+}
+
 function initSidebar() {
     initDrawer();
 }

@@ -191,14 +191,7 @@ function buildProductCard(item) {
                loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'product-image-placeholder\\' style=\\'background:${cat.bg}\\'>'+\\'${cat.icon}\\'+'</div>'">`
         : `<div class="product-image-placeholder" style="background:${cat.bg}; font-size:3rem;">${cat.icon}</div>`;
 
-    const nutritionHtml = item.calories_per_100g
-        ? `<div class="nutrition-grid" style="margin-top:0.5rem;">
-               <div class="nutrition-item"><div class="nutrition-value">${item.calories_per_100g}</div><div class="nutrition-label">kcal</div></div>
-               <div class="nutrition-item"><div class="nutrition-value">${item.proteins_per_100g ?? '—'}</div><div class="nutrition-label">proteine</div></div>
-               <div class="nutrition-item"><div class="nutrition-value">${item.carbs_per_100g ?? '—'}</div><div class="nutrition-label">carbo</div></div>
-               <div class="nutrition-item"><div class="nutrition-value">${item.fats_per_100g ?? '—'}</div><div class="nutrition-label">grassi</div></div>
-           </div>`
-        : '';
+    const nutritionHtml = buildNutritionPanel(item);
 
     return `
         <div class="${cardClass}">
@@ -493,7 +486,14 @@ async function handleAddSubmit(e) {
     try {
         const res = await api.post('/pantry/add.php', {
             name, brand, barcode, category, quantity, unit,
-            expiry_date: expiry, location, notes
+            expiry_date: expiry, location, notes,
+            image_url:         selectedProduct?.image_url         ?? null,
+            calories_per_100g: selectedProduct?.calories_per_100g ?? null,
+            proteins_per_100g: selectedProduct?.proteins_per_100g ?? null,
+            carbs_per_100g:    selectedProduct?.carbs_per_100g    ?? null,
+            fats_per_100g:     selectedProduct?.fats_per_100g     ?? null,
+            fiber_per_100g:    selectedProduct?.fiber_per_100g    ?? null,
+            salt_per_100g:     selectedProduct?.salt_per_100g     ?? null,
         });
 
         if (res.success) {

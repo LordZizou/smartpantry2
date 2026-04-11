@@ -101,6 +101,8 @@ foreach ($rawProducts as $p) {
     $proteins         = $nutriments['proteins_100g']    ?? null;
     $carbs            = $nutriments['carbohydrates_100g'] ?? null;
     $fats             = $nutriments['fat_100g']          ?? null;
+    $fiber            = $nutriments['fiber_100g']        ?? null;
+    $salt             = $nutriments['salt_100g']         ?? null;
     $ingredients      = $p['ingredients_text_it'] ?? $p['ingredients_text'] ?? null;
 
     $products[] = [
@@ -114,6 +116,8 @@ foreach ($rawProducts as $p) {
         'proteins_per_100g' => $proteins !== null ? round((float) $proteins, 1) : null,
         'carbs_per_100g'    => $carbs    !== null ? round((float) $carbs,    1) : null,
         'fats_per_100g'     => $fats     !== null ? round((float) $fats,     1) : null,
+        'fiber_per_100g'    => $fiber    !== null ? round((float) $fiber,    1) : null,
+        'salt_per_100g'     => $salt     !== null ? round((float) $salt,     1) : null,
     ];
 }
 
