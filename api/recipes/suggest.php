@@ -15,6 +15,7 @@
 require_once __DIR__ . '/../../includes/cors_headers.php';
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/auth_check.php';
+require_once __DIR__ . '/../../includes/spoonacular.php';
 
 setJsonHeaders();
 requireAuth();
@@ -41,40 +42,18 @@ if (empty($pantryItems)) {
 $ingredients = array_map('strtolower', $pantryItems);
 $ingredients = array_map('trim', $ingredients);
 
-// Passo 2: chiama Spoonacular findByIngredients
-$ingredientsParam = urlencode(implode(',', $ingredients));
+// Passo 2: chiama Spoonacular findByIngredients (con fallback automatico tra le chiavi)
 $ranking = $pantryOnly ? 2 : 1; // 2 = massimizza ingredienti usati, 1 = minimizza ingredienti mancanti
 
-$url = SPOONACULAR_URL . '/recipes/findByIngredients'
-    . '?apiKey=' . SPOONACULAR_API_KEY
-    . '&ingredients=' . $ingredientsParam
-    . '&number=' . $number
-    . '&ranking=' . $ranking
-    . '&ignorePantry=false';
-
-$context = stream_context_create([
-    'http' => [
-        'timeout'    => 15,
-        'user_agent' => 'SmartPantry/1.0',
-        'method'     => 'GET'
-    ]
+$recipes = spoonacularGet('/recipes/findByIngredients', [
+    'ingredients'  => implode(',', $ingredients),
+    'number'       => $number,
+    'ranking'      => $ranking,
+    'ignorePantry' => 'false',
 ]);
 
-$response = @file_get_contents($url, false, $context);
-
-if ($response === false) {
-    jsonError('Impossibile contattare Spoonacular. Controlla la connessione o la chiave API.', 503);
-}
-
-$recipes = json_decode($response, true);
-
-if (!is_array($recipes)) {
-    jsonError('Risposta non valida da Spoonacular', 502);
-}
-
-// Controlla errore API (chiave non valida, limite raggiunto, ecc.)
-if (isset($recipes['status']) && $recipes['status'] === 'failure') {
-    jsonError('Errore Spoonacular: ' . ($recipes['message'] ?? 'chiave API non valida'), 502);
+if ($recipes === null) {
+    jsonError('Impossibile contattare Spoonacular. Controlla la connessione o le chiavi API.', 503);
 }
 
 if (empty($recipes)) {

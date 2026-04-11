@@ -1,8 +1,9 @@
 <?php
 // Configurazione del progetto — NON committare questo file con dati reali
 
-// Chiave API Spoonacular per i suggerimenti di ricette
-define('SPOONACULAR_API_KEY', 'aef0e85a8e854cfca43025b1b8efd918');
+// Chiavi API Spoonacular — la seconda viene usata automaticamente se la prima raggiunge il limite
+define('SPOONACULAR_API_KEY',   'aef0e85a8e854cfca43025b1b8efd918');
+define('SPOONACULAR_API_KEY_2', 'c46644dc333e412eb40addc5d867a8ed');
 
 // Configurazione database MariaDB
 define('DB_HOST', 'localhost');
