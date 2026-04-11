@@ -112,6 +112,7 @@
         }
         @media (max-width: 768px) {
             .dashboard-grid { grid-template-columns: 1fr; }
+            #charts-row { grid-template-columns: 1fr !important; }
         }
 
         .chips-wrap {
@@ -266,9 +267,37 @@
                 </div>
 
             </div>
+
+            <!-- Grafici statistiche -->
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.25rem; margin-top:1.25rem;" id="charts-row">
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Categorie in dispensa</span>
+                    </div>
+                    <div class="card-body" style="display:flex; align-items:center; justify-content:center; min-height:220px;">
+                        <div id="chart-cat-loading" class="loading" style="padding:1.5rem;"><div class="spinner"></div></div>
+                        <canvas id="chart-categories" style="display:none; max-height:220px;"></canvas>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Nutrienti medi (per 100g)</span>
+                    </div>
+                    <div class="card-body" style="display:flex; align-items:center; justify-content:center; min-height:220px;">
+                        <div id="chart-nut-loading" class="loading" style="padding:1.5rem;"><div class="spinner"></div></div>
+                        <div id="chart-nut-empty" style="display:none; text-align:center; color:var(--text-light); font-size:0.9rem; padding:1rem;">
+                            Nessun dato nutrizionale disponibile.<br>
+                            <small>Aggiungi prodotti tramite scanner per vedere i nutrienti.</small>
+                        </div>
+                        <canvas id="chart-nutrition" style="display:none; max-height:220px;"></canvas>
+                    </div>
+                </div>
+            </div>
+
         </main>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="js/api.js"></script>
 <script src="js/dashboard.js"></script>
 </body>

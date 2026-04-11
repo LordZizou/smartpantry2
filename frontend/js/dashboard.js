@@ -26,10 +26,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     initSidebar();
     initLogout();
 
-    // Carica dispensa e ricette in parallelo
+    // Carica dispensa, ricette e statistiche in parallelo
     const [pantryRes] = await Promise.all([
         api.get('/pantry/list.php'),
-        loadRecipesPreview()
+        loadRecipesPreview(),
+        loadCharts()
     ]);
 
     if (pantryRes.success) {
@@ -200,6 +201,109 @@ async function loadRecipesPreview() {
                 Impossibile caricare le ricette.</p>`;
         }
     }
+}
+
+// ---- Grafici statistiche ----
+
+async function loadCharts() {
+    try {
+        const res = await api.get('/pantry/stats.php');
+        if (!res.success) return;
+        renderCategoryChart(res.categories);
+        renderNutritionChart(res.nutrition);
+    } catch {
+        hideLoader('chart-cat-loading');
+        hideLoader('chart-nut-loading');
+    }
+}
+
+function renderCategoryChart(categories) {
+    hideLoader('chart-cat-loading');
+    if (!categories?.length) return;
+
+    const catColors = {
+        latticini: '#ffe082', verdura: '#a5d6a7', frutta: '#f48fb1',
+        carne: '#ffab91', pesce: '#90caf9', cereali: '#ffcc80',
+        surgelati: '#9fa8da', bevande: '#81d4fa', condimenti: '#ce93d8',
+        snack: '#ef9a9a', conserve: '#c5e1a5', altro: '#e0e0e0',
+    };
+    const catLabels = {
+        latticini: 'Latticini', verdura: 'Verdura', frutta: 'Frutta',
+        carne: 'Carne', pesce: 'Pesce', cereali: 'Cereali & Pasta',
+        surgelati: 'Surgelati', bevande: 'Bevande', condimenti: 'Condimenti',
+        snack: 'Snack & Dolci', conserve: 'Conserve', altro: 'Altro',
+    };
+
+    const canvas = document.getElementById('chart-categories');
+    canvas.style.display = 'block';
+
+    new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            labels: categories.map(c => catLabels[c.category] || c.category),
+            datasets: [{
+                data: categories.map(c => c.count),
+                backgroundColor: categories.map(c => catColors[c.category] || '#e0e0e0'),
+                borderWidth: 2,
+                borderColor: '#fff',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { position: 'right', labels: { font: { size: 11 }, boxWidth: 14, padding: 8 } },
+                tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} prodott${ctx.raw === 1 ? 'o' : 'i'}` } }
+            },
+            cutout: '60%',
+        }
+    });
+}
+
+function renderNutritionChart(nutrition) {
+    hideLoader('chart-nut-loading');
+    if (!nutrition?.avg_calories) {
+        document.getElementById('chart-nut-empty').style.display = 'block';
+        return;
+    }
+
+    const canvas = document.getElementById('chart-nutrition');
+    canvas.style.display = 'block';
+
+    const labels  = ['Calorie (kcal)', 'Proteine (g)', 'Carboidrati (g)', 'Grassi (g)', 'Fibre (g)', 'Sale (g)'];
+    const values  = [
+        nutrition.avg_calories, nutrition.avg_proteins,
+        nutrition.avg_carbs,    nutrition.avg_fats,
+        nutrition.avg_fiber,    nutrition.avg_salt,
+    ].map(v => v ?? 0);
+    const colors  = ['#f59e0b', '#3b82f6', '#8b5cf6', '#ef4444', '#10b981', '#6b7280'];
+
+    new Chart(canvas, {
+        type: 'bar',
+        data: {
+            labels,
+            datasets: [{
+                label: 'Media per 100g',
+                data: values,
+                backgroundColor: colors.map(c => c + 'cc'),
+                borderColor: colors,
+                borderWidth: 1,
+                borderRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: { display: false },
+                tooltip: { callbacks: { label: ctx => ` ${ctx.raw}` } },
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { font: { size: 10 } } },
+                x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+            }
+        }
+    });
 }
 
 // ---- Utility ----
