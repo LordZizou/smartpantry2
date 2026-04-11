@@ -41,10 +41,9 @@ function initTabs() {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.tab;
             document.querySelectorAll('.pill-tab').forEach(b => b.classList.toggle('active', b === btn));
-            document.getElementById('section-suggested').style.display = tab === 'suggested' ? 'block' : 'none';
-            document.getElementById('section-search').style.display    = tab === 'search'    ? 'block' : 'none';
-            const shopEl = document.getElementById('section-shopping');
-            if (shopEl) shopEl.classList.toggle('hidden', tab !== 'shopping');
+            document.getElementById('section-suggested').classList.toggle('hidden', tab !== 'suggested');
+            document.getElementById('section-search').classList.toggle('hidden',    tab !== 'search');
+            document.getElementById('section-shopping').classList.toggle('hidden',  tab !== 'shopping');
         });
     });
 }
@@ -197,8 +196,9 @@ function quickSearch(query) {
 async function searchRecipes(query) {
     // Mostra sezione ricerca
     document.querySelectorAll('.pill-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'search'));
-    document.getElementById('section-suggested').style.display = 'none';
-    document.getElementById('section-search').style.display    = 'block';
+    document.getElementById('section-suggested').classList.add('hidden');
+    document.getElementById('section-search').classList.remove('hidden');
+    document.getElementById('section-shopping').classList.add('hidden');
 
     // Nascondi suggerimenti e mostra loader
     document.getElementById('search-suggestions').style.display = 'none';
