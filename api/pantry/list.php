@@ -73,6 +73,8 @@ $sql = "SELECT
             p.proteins_per_100g,
             p.carbs_per_100g,
             p.fats_per_100g,
+            p.fiber_per_100g,
+            p.salt_per_100g,
             -- Calcola lo stato di scadenza
             CASE
                 WHEN pi.expiry_date IS NULL THEN 'ok'
@@ -104,6 +106,8 @@ foreach ($items as &$item) {
     $item['proteins_per_100g'] = $item['proteins_per_100g'] !== null ? (float) $item['proteins_per_100g'] : null;
     $item['carbs_per_100g']    = $item['carbs_per_100g']    !== null ? (float) $item['carbs_per_100g']    : null;
     $item['fats_per_100g']     = $item['fats_per_100g']     !== null ? (float) $item['fats_per_100g']     : null;
+    $item['fiber_per_100g']    = $item['fiber_per_100g']    !== null ? (float) $item['fiber_per_100g']    : null;
+    $item['salt_per_100g']     = $item['salt_per_100g']     !== null ? (float) $item['salt_per_100g']     : null;
     $item['days_to_expiry']    = $item['days_to_expiry']    !== null ? (int)   $item['days_to_expiry']    : null;
 }
 unset($item);
