@@ -3,8 +3,9 @@
  * Wrapper attorno a fetch() con gestione errori centralizzata
  */
 
-// Base URL del backend — si adatta automaticamente in base all'origine
-const API_BASE = window.location.origin + '/smartpantry2/api';
+// Base URL del backend — calcolata dinamicamente dal percorso corrente
+// Funziona con qualsiasi sottocartella (es. /gitsmartpantry/smartpantry2/)
+const API_BASE = new URL('../api', window.location.href).href.replace(/\/$/, '');
 
 // ---- Definizione categorie prodotti (icona, colori, etichetta) ----
 const CATEGORIES = {
