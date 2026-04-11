@@ -257,13 +257,7 @@ function showProductResult(product, identifier, source) {
         : `<div style="width:80px;height:80px;background:var(--green-100);border-radius:8px;
                        display:flex;align-items:center;justify-content:center;font-size:2.2rem;flex-shrink:0;">🥫</div>`;
 
-    const nutritionHtml = product.calories_per_100g
-        ? `<div class="nutrition-grid" style="margin-top:0.75rem;">
-               <div class="nutrition-item"><div class="nutrition-value">${product.calories_per_100g}</div><div class="nutrition-label">kcal/100g</div></div>
-               <div class="nutrition-item"><div class="nutrition-value">${product.proteins_per_100g ?? '—'}</div><div class="nutrition-label">Proteine</div></div>
-               <div class="nutrition-item"><div class="nutrition-value">${product.carbs_per_100g ?? '—'}</div><div class="nutrition-label">Carboidrati</div></div>
-               <div class="nutrition-item"><div class="nutrition-value">${product.fats_per_100g ?? '—'}</div><div class="nutrition-label">Grassi</div></div>
-           </div>` : '';
+    const nutritionHtml = buildNutritionPanel(product);
 
     // Opzioni categoria per il select
     const catOptions = '<option value="">— seleziona —</option>' + buildCategoryOptions(guessCategory(product));
@@ -333,6 +327,43 @@ function showProductResult(product, identifier, source) {
         </div>`;
 
     section.querySelector('#form-scan-add')?.addEventListener('submit', handleScanAdd);
+}
+
+/** Costruisce il pannello visivo dei valori nutrizionali */
+function buildNutritionPanel(product) {
+    const nutrients = [
+        { key: 'calories_per_100g', label: 'Calorie',     unit: 'kcal', daily: 2000, color: '#f59e0b' },
+        { key: 'proteins_per_100g', label: 'Proteine',    unit: 'g',    daily: 50,   color: '#3b82f6' },
+        { key: 'carbs_per_100g',    label: 'Carboidrati', unit: 'g',    daily: 260,  color: '#8b5cf6' },
+        { key: 'fats_per_100g',     label: 'Grassi',      unit: 'g',    daily: 70,   color: '#ef4444' },
+        { key: 'fiber_per_100g',    label: 'Fibre',       unit: 'g',    daily: 25,   color: '#10b981' },
+        { key: 'salt_per_100g',     label: 'Sale',        unit: 'g',    daily: 6,    color: '#6b7280' },
+    ];
+
+    const rows = nutrients
+        .filter(n => product[n.key] != null)
+        .map(n => {
+            const val = parseFloat(product[n.key]);
+            const pct = Math.min(100, Math.round(val / n.daily * 100));
+            return `
+            <div class="nutrient-row">
+                <span class="nutrient-name">${n.label}</span>
+                <div class="nutrient-bar-wrap">
+                    <div class="nutrient-bar" style="width:${pct}%; background:${n.color};"></div>
+                </div>
+                <span class="nutrient-val">${val} ${n.unit}</span>
+                <span class="nutrient-pct">${pct}%</span>
+            </div>`;
+        }).join('');
+
+    if (!rows) return '';
+
+    return `
+        <div class="nutrition-panel">
+            <div class="nutrition-panel-title">Valori nutrizionali <small style="font-weight:400;color:var(--text-light);">per 100g</small></div>
+            ${rows}
+            <div class="nutrition-footnote">* % rispetto al fabbisogno giornaliero di riferimento (2000 kcal)</div>
+        </div>`;
 }
 
 /** Indovina la categoria dal campo of_category del prodotto */
