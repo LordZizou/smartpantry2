@@ -67,7 +67,13 @@ async function loadShoppingFromRecipes() {
             panel.innerHTML = `<div class="alert alert-info">${escapeHtml(res.message || 'Nessun ingrediente. Pianifica prima i pasti nella sezione Piano pasti.')}</div>`;
             return;
         }
+        const label = `Periodo: ${formatDate(start)} — ${formatDate(end)}`;
+
         panel.innerHTML = `
+            <div class="shopping-export-actions" style="margin-bottom:1rem;">
+                <button class="btn btn-outline btn-sm" id="btn-download-shopping-r">Scarica .txt</button>
+                <button class="btn btn-outline btn-sm" id="btn-print-shopping-r">Stampa</button>
+            </div>
             ${res.missing.length ? `<div class="shopping-section">
                 <div class="shopping-section-title missing">Da comprare (${res.missing.length})</div>
                 <ul class="shopping-ul">${res.missing.map(i=>`<li class="shopping-item missing">${escapeHtml(i)}</li>`).join('')}</ul>
@@ -76,6 +82,11 @@ async function loadShoppingFromRecipes() {
                 <div class="shopping-section-title available">Già in dispensa (${res.available.length})</div>
                 <ul class="shopping-ul">${res.available.map(i=>`<li class="shopping-item available">${escapeHtml(i)}</li>`).join('')}</ul>
             </div>` : ''}`;
+
+        document.getElementById('btn-download-shopping-r')
+            .addEventListener('click', () => downloadShoppingList(res.missing, res.available, label));
+        document.getElementById('btn-print-shopping-r')
+            .addEventListener('click', () => printShoppingList(res.missing, res.available, label));
     } catch {
         panel.innerHTML = '<div class="alert alert-warning">Errore nella generazione della lista.</div>';
     }

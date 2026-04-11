@@ -1706,6 +1706,9 @@ input:checked + .toggle-slider::before {
 }
 .shopping-section-title.missing  { color: var(--danger); }
 .shopping-section-title.available { color: var(--success); }
+.shopping-list-header { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 0.75rem; margin-bottom: 1rem; }
+.shopping-list-header h3 { margin: 0; font-size: 1.1rem; }
+.shopping-export-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
 .shopping-ul { list-style: none; display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0; padding: 0; }
 .shopping-item {
     display: inline-flex;

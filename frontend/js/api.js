@@ -196,7 +196,72 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// ---- Drawer navigazione ----
+// ---- Export lista spesa ----
+
+/**
+ * Scarica la lista spesa come file .txt
+ */
+function downloadShoppingList(missing, available, label) {
+    const sep = '='.repeat(40);
+    let text = `LISTA DELLA SPESA\n${label}\n${sep}\n\n`;
+
+    if (missing.length) {
+        text += `DA COMPRARE (${missing.length})\n`;
+        missing.forEach(item => { text += `  [ ] ${item}\n`; });
+        text += '\n';
+    }
+    if (available.length) {
+        text += `GIA' IN DISPENSA (${available.length})\n`;
+        available.forEach(item => { text += `  [x] ${item}\n`; });
+    }
+
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = `lista-spesa-${new Date().toISOString().slice(0, 10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+/**
+ * Apre una finestra di stampa con la lista spesa formattata
+ */
+function printShoppingList(missing, available, label) {
+    const win = window.open('', '_blank', 'width=600,height=700');
+    const missingHtml  = missing.map(i  => `<li>${escapeHtml(i)}</li>`).join('');
+    const availableHtml = available.map(i => `<li>${escapeHtml(i)}</li>`).join('');
+
+    win.document.write(`<!DOCTYPE html>
+<html lang="it"><head>
+<meta charset="UTF-8">
+<title>Lista della spesa</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 2rem; color: #1a1a1a; }
+  h1 { color: #16a34a; font-size: 1.5rem; margin-bottom: 0.25rem; }
+  .label { color: #555; font-size: 0.9rem; margin-bottom: 1.5rem; }
+  h2 { font-size: 1rem; margin: 1.2rem 0 0.5rem; }
+  h2.missing   { color: #991b1b; }
+  h2.available { color: #14532d; }
+  ul { list-style: none; padding: 0; margin: 0; }
+  li { padding: 0.35rem 0; border-bottom: 1px solid #eee; font-size: 0.95rem; }
+  li::before { margin-right: 0.5rem; }
+  .missing-list   li::before { content: "☐"; color: #991b1b; }
+  .available-list li::before { content: "✓"; color: #16a34a; }
+  @media print { body { padding: 0.5rem; } }
+</style>
+</head><body>
+<h1>Lista della spesa</h1>
+<div class="label">${escapeHtml(label)}</div>
+${missing.length  ? `<h2 class="missing">Da comprare (${missing.length})</h2><ul class="missing-list">${missingHtml}</ul>` : ''}
+${available.length? `<h2 class="available">Già in dispensa (${available.length})</h2><ul class="available-list">${availableHtml}</ul>` : ''}
+</body></html>`);
+    win.document.close();
+    win.focus();
+    win.print();
+}
 
 function initSidebar() {
     initDrawer();
