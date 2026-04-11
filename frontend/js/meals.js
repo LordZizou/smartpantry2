@@ -430,12 +430,16 @@ async function generateShoppingList() {
             return;
         }
 
+        const label = `Periodo: ${formatDate(start)} — ${formatDate(end)}`;
+
         panel.innerHTML = `
             <div class="shopping-list-header">
                 <h3>Lista della spesa</h3>
-                <p style="font-size:0.85rem; color:var(--text-light);">
-                    Periodo: ${formatDate(start)} — ${formatDate(end)}
-                </p>
+                <p style="font-size:0.85rem; color:var(--text-light);">${label}</p>
+                <div class="shopping-export-actions">
+                    <button class="btn btn-outline btn-sm" id="btn-download-shopping">Scarica .txt</button>
+                    <button class="btn btn-outline btn-sm" id="btn-print-shopping">Stampa</button>
+                </div>
             </div>
             ${res.missing.length ? `
             <div class="shopping-section">
@@ -451,6 +455,11 @@ async function generateShoppingList() {
                     ${res.available.map(i => `<li class="shopping-item available">${escapeHtml(i)}</li>`).join('')}
                 </ul>
             </div>` : ''}`;
+
+        document.getElementById('btn-download-shopping')
+            .addEventListener('click', () => downloadShoppingList(res.missing, res.available, label));
+        document.getElementById('btn-print-shopping')
+            .addEventListener('click', () => printShoppingList(res.missing, res.available, label));
     } catch {
         panel.innerHTML = '<div class="alert alert-warning">Errore nella generazione della lista.</div>';
     }
