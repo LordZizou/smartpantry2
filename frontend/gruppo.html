@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Pantry — Il mio Gruppo</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .group-card {
+            background: var(--bg-1);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        .group-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .group-name {
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+        .group-meta {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+        .invite-code-box {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--bg-2);
+            border: 1px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 0.5rem 0.8rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .invite-code {
+            font-family: 'Courier New', monospace;
+            font-size: 1.15rem;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: var(--primary);
+            flex: 1;
+        }
+        .members-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .member-row {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.4rem 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+        .member-row:last-child { border-bottom: none; }
+        .member-avatar {
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            background: var(--primary-bg);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+        .member-name { flex: 1; font-size: 0.9rem; font-weight: 600; }
+        .role-badge {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+        .role-badge.admin   { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .role-badge.member  { background: var(--bg-2); color: var(--text-light); border: 1px solid var(--border); }
+        .group-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.75rem;
+        }
+        .no-groups-state {
+            text-align: center;
+            padding: 2.5rem 1rem;
+            color: var(--text-light);
+        }
+        .no-groups-state .big-icon { font-size: 3rem; margin-bottom: 0.75rem; }
+        .form-row {
+            display: flex;
+            gap: 0.6rem;
+            align-items: flex-end;
+        }
+        .form-row .form-group { flex: 1; }
+        .section-divider {
+            text-align: center;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section-divider::before,
+        .section-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-light);
+        }
+        .context-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.82rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .context-indicator.personal { background: var(--bg-2); color: var(--text-light); border: 1px solid var(--border); }
+        .context-indicator.group    { background: var(--primary-bg); color: var(--primary); border: 1px solid var(--primary-soft); }
+    </style>
+</head>
+<body>
+
+<nav class="drawer" id="drawer">
+    <div class="drawer-header">
+        <div class="drawer-brand">
+            <div class="brand-mark"></div>
+            <span>Smart Pantry</span>
+        </div>
+        <button class="drawer-close" id="drawer-close">&times;</button>
+    </div>
+    <div class="drawer-nav">
+        <a href="dashboard.html"    class="nav-link">Dashboard</a>
+        <a href="pantry.html"       class="nav-link">Dispensa</a>
+        <a href="scanner.html"      class="nav-link">Aggiungi prodotto</a>
+        <a href="recipes.html"      class="nav-link">Ricette</a>
+        <a href="meals.html"        class="nav-link">Piano pasti</a>
+        <a href="supermercati.html" class="nav-link">🗺️ Supermercati</a>
+        <a href="gruppo.html"       class="nav-link active">👥 Gruppo</a>
+    </div>
+    <div class="drawer-footer">
+        <div class="user-chip">
+            <div class="user-avatar" id="sidebar-avatar">U</div>
+            <span class="user-name" id="sidebar-username">Utente</span>
+        </div>
+        <button class="btn btn-ghost btn-sm" id="btn-logout">Esci</button>
+    </div>
+</nav>
+<div class="drawer-overlay" id="drawer-overlay"></div>
+
+<div class="app">
+    <header class="topbar">
+        <button class="hamburger" id="hamburger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+        <h1 class="page-title">👥 Gruppo</h1>
+    </header>
+
+    <main class="page-content">
+
+        <div class="page-intro">
+            <h2>Condividi la dispensa</h2>
+            <p>Crea un gruppo o unisciti a uno esistente per condividere dispensa e piano pasti con familiari o coinquilini.</p>
+        </div>
+
+        <!-- Contesto attivo -->
+        <div id="active-context-bar" style="margin-bottom:1rem;"></div>
+
+        <!-- Tab pillola -->
+        <div class="pill-tabs">
+            <button class="pill-tab active" data-tab="my-groups">I miei gruppi</button>
+            <button class="pill-tab" data-tab="create">Crea gruppo</button>
+            <button class="pill-tab" data-tab="join">Entra in un gruppo</button>
+        </div>
+
+        <!-- ===== SEZIONE: I MIEI GRUPPI ===== -->
+        <div id="section-my-groups">
+            <div id="groups-loader" class="loading" style="padding:2rem;">
+                <div class="spinner"></div>
+                <span>Caricamento gruppi…</span>
+            </div>
+            <div id="groups-list" style="display:none;"></div>
+        </div>
+
+        <!-- ===== SEZIONE: CREA GRUPPO ===== -->
+        <div id="section-create" class="hidden">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Crea un nuovo gruppo</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-size:0.88rem; color:var(--text-light); margin-bottom:1rem;">
+                        Diventerai automaticamente admin del gruppo e potrai invitare altri tramite il codice.
+                    </p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Nome del gruppo</label>
+                            <input class="form-control" type="text" id="new-group-name"
+                                   placeholder="es. Famiglia, Coinquilini 2025…" maxlength="100">
+                        </div>
+                        <button class="btn btn-primary" id="btn-create-group" style="white-space:nowrap; align-self:flex-end;">
+                            Crea gruppo
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SEZIONE: ENTRA IN UN GRUPPO ===== -->
+        <div id="section-join" class="hidden">
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">Entra in un gruppo esistente</span>
+                </div>
+                <div class="card-body">
+                    <p style="font-size:0.88rem; color:var(--text-light); margin-bottom:1rem;">
+                        Chiedi il codice invito all'admin del gruppo e inseriscilo qui sotto.
+                    </p>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Codice invito</label>
+                            <input class="form-control" type="text" id="join-code"
+                                   placeholder="Es. A1B2C3D4" maxlength="10"
+                                   style="text-transform:uppercase; letter-spacing:0.1em; font-family:monospace; font-size:1rem;">
+                        </div>
+                        <button class="btn btn-primary" id="btn-join-group" style="white-space:nowrap; align-self:flex-end;">
+                            Entra
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<script src="js/api.js"></script>
+<script src="js/gruppo.js"></script>
+</body>
+</html>

@@ -10,6 +10,7 @@
 require_once __DIR__ . '/../../includes/cors_headers.php';
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/auth_check.php';
+require_once __DIR__ . '/../../includes/group_check.php';
 
 setJsonHeaders();
 requireAuth();
@@ -18,12 +19,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     jsonError('Metodo non consentito', 405);
 }
 
-$pdo    = getDB();
-$userId = getCurrentUserId();
+$pdo     = getDB();
+$userId  = getCurrentUserId();
+$groupId = getActiveGroupId();
 
-// Costruisci la query dinamicamente in base ai filtri
-$where  = ['pi.user_id = ?'];
-$params = [$userId];
+// Costruisci la query dinamicamente in base al contesto (personale o gruppo)
+if ($groupId !== null) {
+    requireGroupMember($userId, $groupId);
+    $where  = ['pi.group_id = ?'];
+    $params = [$groupId];
+} else {
+    $where  = ['pi.user_id = ?', 'pi.group_id IS NULL'];
+    $params = [$userId];
+}
 
 // Filtro ricerca per nome
 $search = trim($_GET['search'] ?? '');

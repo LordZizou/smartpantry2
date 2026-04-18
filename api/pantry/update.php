@@ -7,6 +7,7 @@
 require_once __DIR__ . '/../../includes/cors_headers.php';
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/auth_check.php';
+require_once __DIR__ . '/../../includes/group_check.php';
 
 setJsonHeaders();
 requireAuth();
@@ -25,12 +26,19 @@ if ($itemId <= 0) {
     jsonError('ID prodotto non valido o mancante');
 }
 
-$pdo    = getDB();
-$userId = getCurrentUserId();
+$pdo     = getDB();
+$userId  = getCurrentUserId();
+$groupId = getActiveGroupId();
 
-// Verifica che il prodotto appartenga all'utente corrente
-$stmtCheck = $pdo->prepare('SELECT id FROM pantry_items WHERE id = ? AND user_id = ?');
-$stmtCheck->execute([$itemId, $userId]);
+// Verifica che il prodotto appartenga al contesto corrente
+if ($groupId !== null) {
+    requireGroupMember($userId, $groupId);
+    $stmtCheck = $pdo->prepare('SELECT id FROM pantry_items WHERE id = ? AND group_id = ?');
+    $stmtCheck->execute([$itemId, $groupId]);
+} else {
+    $stmtCheck = $pdo->prepare('SELECT id FROM pantry_items WHERE id = ? AND user_id = ? AND group_id IS NULL');
+    $stmtCheck->execute([$itemId, $userId]);
+}
 if (!$stmtCheck->fetch()) {
     jsonError('Prodotto non trovato', 404);
 }
@@ -87,11 +95,13 @@ if (empty($updateFields)) {
     jsonError('Nessun campo da aggiornare fornito');
 }
 
-// Aggiungi id e user_id ai parametri WHERE
+// Aggiungi id e il parametro WHERE contestuale
 $params[] = $itemId;
-$params[] = $userId;
+$params[] = $groupId !== null ? $groupId : $userId;
 
-$sql = 'UPDATE pantry_items SET ' . implode(', ', $updateFields) . ' WHERE id = ? AND user_id = ?';
+$sql = $groupId !== null
+    ? 'UPDATE pantry_items SET ' . implode(', ', $updateFields) . ' WHERE id = ? AND group_id = ?'
+    : 'UPDATE pantry_items SET ' . implode(', ', $updateFields) . ' WHERE id = ? AND user_id = ? AND group_id IS NULL';
 $stmt = $pdo->prepare($sql);
 $stmt->execute($params);
 

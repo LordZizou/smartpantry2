@@ -7,6 +7,7 @@
 require_once __DIR__ . '/../../includes/cors_headers.php';
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/auth_check.php';
+require_once __DIR__ . '/../../includes/group_check.php';
 
 setJsonHeaders();
 requireAuth();
@@ -23,12 +24,19 @@ if ($itemId <= 0) {
     jsonError('ID prodotto non valido o mancante');
 }
 
-$pdo    = getDB();
-$userId = getCurrentUserId();
+$pdo     = getDB();
+$userId  = getCurrentUserId();
+$groupId = getActiveGroupId();
 
-// Elimina il prodotto solo se appartiene all'utente corrente
-$stmt = $pdo->prepare('DELETE FROM pantry_items WHERE id = ? AND user_id = ?');
-$stmt->execute([$itemId, $userId]);
+// Elimina in base al contesto (personale o gruppo)
+if ($groupId !== null) {
+    requireGroupMember($userId, $groupId);
+    $stmt = $pdo->prepare('DELETE FROM pantry_items WHERE id = ? AND group_id = ?');
+    $stmt->execute([$itemId, $groupId]);
+} else {
+    $stmt = $pdo->prepare('DELETE FROM pantry_items WHERE id = ? AND user_id = ? AND group_id IS NULL');
+    $stmt->execute([$itemId, $userId]);
+}
 
 if ($stmt->rowCount() === 0) {
     jsonError('Prodotto non trovato', 404);

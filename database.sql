@@ -118,3 +118,36 @@ CREATE TABLE IF NOT EXISTS meal_plans (
 --                                     in più dispense (anche NULL se manuale)
 -- users (1) ——< saved_recipes (N)  : un utente può salvare più ricette
 -- ============================================================
+
+-- ============================================================
+-- Gruppi — consente a più utenti di condividere dispensa e piano pasti
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS user_groups (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    name        VARCHAR(100) NOT NULL,
+    invite_code VARCHAR(10)  NOT NULL UNIQUE,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_invite_code (invite_code)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS group_members (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    group_id    INT NOT NULL,
+    user_id     INT NOT NULL,
+    role        ENUM('admin','member') NOT NULL DEFAULT 'member',
+    joined_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (group_id) REFERENCES user_groups(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id)  REFERENCES users(id)        ON DELETE CASCADE,
+    UNIQUE KEY uq_group_member (group_id, user_id),
+    INDEX idx_user_id (user_id)
+) ENGINE=InnoDB;
+
+-- Migrazione: aggiunge group_id alle tabelle esistenti (eseguire una sola volta)
+ALTER TABLE pantry_items
+    ADD COLUMN IF NOT EXISTS group_id INT DEFAULT NULL AFTER user_id,
+    ADD INDEX  IF NOT EXISTS idx_pantry_group (group_id);
+
+ALTER TABLE meal_plans
+    ADD COLUMN IF NOT EXISTS group_id INT DEFAULT NULL AFTER user_id,
+    ADD INDEX  IF NOT EXISTS idx_meals_group (group_id);

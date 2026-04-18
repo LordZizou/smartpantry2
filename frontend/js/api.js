@@ -111,7 +111,91 @@ async function requireLogin() {
         window.location.href = '../index.html';
         return null;
     }
+    initContextSwitcher(user);
     return user;
+}
+
+/**
+ * Renderizza il selettore di contesto (personale / gruppo) nella topbar.
+ * Viene chiamato automaticamente da requireLogin().
+ */
+function initContextSwitcher(user) {
+    const topbar = document.querySelector('.topbar');
+    if (!topbar) return;
+
+    document.getElementById('context-switcher')?.remove();
+
+    const groups = user.groups || [];
+    const ctx    = user.active_context || { type: 'personal', group_id: null };
+
+    const div = document.createElement('div');
+    div.id = 'context-switcher';
+    div.style.cssText = 'display:flex; align-items:center; gap:0.4rem; flex-shrink:0; margin-left:auto;';
+
+    if (!groups.length) {
+        const a = document.createElement('a');
+        a.href = 'gruppo.html';
+        a.className = 'btn btn-ghost btn-sm';
+        a.style.cssText = 'font-size:0.75rem; white-space:nowrap;';
+        a.title = 'Crea o unisciti a un gruppo';
+        a.textContent = '👥 Gruppo';
+        div.appendChild(a);
+    } else {
+        const select = document.createElement('select');
+        select.id = 'ctx-select';
+        select.title = 'Cambia contesto';
+        select.style.cssText = 'font-size:0.78rem; padding:0.25rem 0.5rem; border-radius:20px; border:1px solid var(--border); background:var(--bg-2); cursor:pointer; max-width:145px; color:var(--text);';
+
+        const personalOpt = document.createElement('option');
+        personalOpt.value = 'personal';
+        personalOpt.textContent = '👤 Personale';
+        if (ctx.type === 'personal') personalOpt.selected = true;
+        select.appendChild(personalOpt);
+
+        groups.forEach(g => {
+            const opt = document.createElement('option');
+            opt.value = `group-${g.id}`;
+            opt.textContent = `👥 ${g.name}`;
+            if (ctx.type === 'group' && ctx.group_id === g.id) opt.selected = true;
+            select.appendChild(opt);
+        });
+
+        select.addEventListener('change', async () => {
+            const val = select.value;
+            const body = val === 'personal'
+                ? { context: 'personal' }
+                : { context: 'group', group_id: parseInt(val.replace('group-', ''), 10) };
+            select.disabled = true;
+            try {
+                const res = await api.post('/groups/switch.php', body);
+                if (res.success) {
+                    window.location.reload();
+                } else {
+                    showToast(res.message || 'Errore nel cambio contesto', 'error');
+                    select.disabled = false;
+                }
+            } catch {
+                showToast('Errore nella comunicazione col server', 'error');
+                select.disabled = false;
+            }
+        });
+
+        div.appendChild(select);
+
+        const a = document.createElement('a');
+        a.href = 'gruppo.html';
+        a.title = 'Gestisci gruppi';
+        a.style.cssText = 'font-size:1rem; text-decoration:none; flex-shrink:0; line-height:1; opacity:0.65;';
+        a.textContent = '⚙';
+        div.appendChild(a);
+    }
+
+    const end = topbar.querySelector('.topbar-end');
+    if (end) {
+        topbar.insertBefore(div, end);
+    } else {
+        topbar.appendChild(div);
+    }
 }
 
 // ---- Toast notifiche ----
