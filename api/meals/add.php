@@ -6,6 +6,7 @@
 require_once __DIR__ . '/../../includes/cors_headers.php';
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/auth_check.php';
+require_once __DIR__ . '/../../includes/group_check.php';
 
 setJsonHeaders();
 requireAuth();
@@ -19,8 +20,13 @@ if ($body === null) {
     jsonError('JSON non valido');
 }
 
-$pdo    = getDB();
-$userId = getCurrentUserId();
+$pdo     = getDB();
+$userId  = getCurrentUserId();
+$groupId = getActiveGroupId();
+
+if ($groupId !== null) {
+    requireGroupMember($userId, $groupId);
+}
 
 // Validazione campi obbligatori
 $date       = trim($body['date']        ?? '');
@@ -46,11 +52,12 @@ $ingredients = array_values(array_filter(array_map('trim', (array)$ingredients))
 $ingredientsJson = !empty($ingredients) ? json_encode($ingredients, JSON_UNESCAPED_UNICODE) : null;
 
 $stmt = $pdo->prepare("
-    INSERT INTO meal_plans (user_id, date, meal_type, title, notes, ingredients, recipe_id, recipe_name)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO meal_plans (user_id, group_id, date, meal_type, title, notes, ingredients, recipe_id, recipe_name)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
 ");
 $stmt->execute([
     $userId,
+    $groupId,
     $date,
     $mealType,
     $title,

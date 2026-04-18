@@ -6,6 +6,7 @@
 require_once __DIR__ . '/../../includes/cors_headers.php';
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/auth_check.php';
+require_once __DIR__ . '/../../includes/group_check.php';
 
 setJsonHeaders();
 requireAuth();
@@ -21,11 +22,18 @@ if (!$id) {
     jsonError('ID non valido');
 }
 
-$pdo    = getDB();
-$userId = getCurrentUserId();
+$pdo     = getDB();
+$userId  = getCurrentUserId();
+$groupId = getActiveGroupId();
 
-$stmt = $pdo->prepare('DELETE FROM meal_plans WHERE id = ? AND user_id = ?');
-$stmt->execute([$id, $userId]);
+if ($groupId !== null) {
+    requireGroupMember($userId, $groupId);
+    $stmt = $pdo->prepare('DELETE FROM meal_plans WHERE id = ? AND group_id = ?');
+    $stmt->execute([$id, $groupId]);
+} else {
+    $stmt = $pdo->prepare('DELETE FROM meal_plans WHERE id = ? AND user_id = ? AND group_id IS NULL');
+    $stmt->execute([$id, $userId]);
+}
 
 if ($stmt->rowCount() === 0) {
     jsonError('Pasto non trovato', 404);

@@ -6,6 +6,7 @@
 require_once __DIR__ . '/../../includes/cors_headers.php';
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/auth_check.php';
+require_once __DIR__ . '/../../includes/group_check.php';
 
 setJsonHeaders();
 requireAuth();
@@ -19,8 +20,9 @@ if ($body === null) {
     jsonError('JSON non valido');
 }
 
-$pdo    = getDB();
-$userId = getCurrentUserId();
+$pdo     = getDB();
+$userId  = getCurrentUserId();
+$groupId = getActiveGroupId();
 
 $id          = (int)($body['id']          ?? 0);
 $title       = trim($body['title']        ?? '');
@@ -36,9 +38,15 @@ if (empty($title)) {
     jsonError('Il nome del pasto è obbligatorio');
 }
 
-// Verifica proprietà del pasto
-$check = $pdo->prepare('SELECT id FROM meal_plans WHERE id = ? AND user_id = ?');
-$check->execute([$id, $userId]);
+// Verifica proprietà del pasto in base al contesto
+if ($groupId !== null) {
+    requireGroupMember($userId, $groupId);
+    $check = $pdo->prepare('SELECT id FROM meal_plans WHERE id = ? AND group_id = ?');
+    $check->execute([$id, $groupId]);
+} else {
+    $check = $pdo->prepare('SELECT id FROM meal_plans WHERE id = ? AND user_id = ? AND group_id IS NULL');
+    $check->execute([$id, $userId]);
+}
 if (!$check->fetch()) {
     jsonError('Pasto non trovato', 404);
 }
@@ -47,11 +55,20 @@ if (!$check->fetch()) {
 $ingredients = array_values(array_filter(array_map('trim', (array)$ingredients)));
 $ingredientsJson = !empty($ingredients) ? json_encode($ingredients, JSON_UNESCAPED_UNICODE) : null;
 
-$stmt = $pdo->prepare("
-    UPDATE meal_plans
-    SET title=?, notes=?, ingredients=?, recipe_id=?, recipe_name=?, updated_at=NOW()
-    WHERE id=? AND user_id=?
-");
-$stmt->execute([$title, $notes ?: null, $ingredientsJson, $recipeId, $recipeName ?: null, $id, $userId]);
+if ($groupId !== null) {
+    $stmt = $pdo->prepare("
+        UPDATE meal_plans
+        SET title=?, notes=?, ingredients=?, recipe_id=?, recipe_name=?, updated_at=NOW()
+        WHERE id=? AND group_id=?
+    ");
+    $stmt->execute([$title, $notes ?: null, $ingredientsJson, $recipeId, $recipeName ?: null, $id, $groupId]);
+} else {
+    $stmt = $pdo->prepare("
+        UPDATE meal_plans
+        SET title=?, notes=?, ingredients=?, recipe_id=?, recipe_name=?, updated_at=NOW()
+        WHERE id=? AND user_id=? AND group_id IS NULL
+    ");
+    $stmt->execute([$title, $notes ?: null, $ingredientsJson, $recipeId, $recipeName ?: null, $id, $userId]);
+}
 
 jsonSuccess(['message' => 'Pasto aggiornato']);

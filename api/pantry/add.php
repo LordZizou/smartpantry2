@@ -24,6 +24,7 @@
 require_once __DIR__ . '/../../includes/cors_headers.php';
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/auth_check.php';
+require_once __DIR__ . '/../../includes/group_check.php';
 
 setJsonHeaders();
 requireAuth();
@@ -70,8 +71,13 @@ if ($expiryDate !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $expiryDate)) {
     jsonError('Formato data non valido. Usa YYYY-MM-DD');
 }
 
-$pdo    = getDB();
-$userId = getCurrentUserId();
+$pdo     = getDB();
+$userId  = getCurrentUserId();
+$groupId = getActiveGroupId();
+
+if ($groupId !== null) {
+    requireGroupMember($userId, $groupId);
+}
 
 // Cerca o crea il prodotto nel catalogo tramite barcode (se fornito)
 $productId = null;
@@ -115,12 +121,13 @@ if ($barcode !== '') {
 
 // Inserisci il prodotto nella dispensa
 $stmt = $pdo->prepare(
-    'INSERT INTO pantry_items (user_id, product_id, name, brand, category, quantity, unit, expiry_date, location, notes)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+    'INSERT INTO pantry_items (user_id, group_id, product_id, name, brand, category, quantity, unit, expiry_date, location, notes)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
 );
 
 $stmt->execute([
     $userId,
+    $groupId,
     $productId,
     $name,
     $brand    ?: null,

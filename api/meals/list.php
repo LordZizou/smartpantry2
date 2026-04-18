@@ -8,6 +8,7 @@
 require_once __DIR__ . '/../../includes/cors_headers.php';
 require_once __DIR__ . '/../../includes/db.php';
 require_once __DIR__ . '/../../includes/auth_check.php';
+require_once __DIR__ . '/../../includes/group_check.php';
 
 setJsonHeaders();
 requireAuth();
@@ -16,8 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     jsonError('Metodo non consentito', 405);
 }
 
-$pdo    = getDB();
-$userId = getCurrentUserId();
+$pdo     = getDB();
+$userId  = getCurrentUserId();
+$groupId = getActiveGroupId();
 
 // Intervallo di date (default: mese corrente)
 $start = trim($_GET['start'] ?? date('Y-m-01'));
@@ -27,13 +29,24 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $start) || !preg_match('/^\d{4}-\d{2}-\
     jsonError('Formato data non valido. Usa YYYY-MM-DD');
 }
 
-$stmt = $pdo->prepare("
-    SELECT id, date, meal_type, title, notes, ingredients, recipe_id, recipe_name, created_at
-    FROM meal_plans
-    WHERE user_id = :uid AND date BETWEEN :start AND :end
-    ORDER BY date ASC, FIELD(meal_type, 'colazione', 'pranzo', 'cena')
-");
-$stmt->execute([':uid' => $userId, ':start' => $start, ':end' => $end]);
+if ($groupId !== null) {
+    requireGroupMember($userId, $groupId);
+    $stmt = $pdo->prepare("
+        SELECT id, date, meal_type, title, notes, ingredients, recipe_id, recipe_name, created_at
+        FROM meal_plans
+        WHERE group_id = ? AND date BETWEEN ? AND ?
+        ORDER BY date ASC, FIELD(meal_type, 'colazione', 'pranzo', 'cena')
+    ");
+    $stmt->execute([$groupId, $start, $end]);
+} else {
+    $stmt = $pdo->prepare("
+        SELECT id, date, meal_type, title, notes, ingredients, recipe_id, recipe_name, created_at
+        FROM meal_plans
+        WHERE user_id = ? AND group_id IS NULL AND date BETWEEN ? AND ?
+        ORDER BY date ASC, FIELD(meal_type, 'colazione', 'pranzo', 'cena')
+    ");
+    $stmt->execute([$userId, $start, $end]);
+}
 $meals = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Decodifica il JSON degli ingredienti
