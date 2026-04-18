@@ -26,15 +26,25 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============================================================
 
 function initTabs() {
-    document.querySelectorAll('.pill-tab').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tab = btn.dataset.tab;
-            document.querySelectorAll('.pill-tab').forEach(b => b.classList.toggle('active', b === btn));
-            document.getElementById('section-my-groups').classList.toggle('hidden', tab !== 'my-groups');
-            document.getElementById('section-create').classList.toggle('hidden',    tab !== 'create');
-            document.getElementById('section-join').classList.toggle('hidden',      tab !== 'join');
-        });
+    document.querySelectorAll('.gruppo-tab').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
+}
+
+function switchTab(tabId) {
+    document.querySelectorAll('.gruppo-tab').forEach(b =>
+        b.classList.toggle('active', b.dataset.tab === tabId)
+    );
+    document.getElementById('section-my-groups').classList.toggle('hidden', tabId !== 'my-groups');
+    document.getElementById('section-create').classList.toggle('hidden',    tabId !== 'create');
+    document.getElementById('section-join').classList.toggle('hidden',      tabId !== 'join');
+
+    if (tabId === 'create') {
+        setTimeout(() => document.getElementById('new-group-name')?.focus(), 80);
+    }
+    if (tabId === 'join') {
+        setTimeout(() => document.getElementById('join-code')?.focus(), 80);
+    }
 }
 
 // ============================================================
@@ -72,9 +82,9 @@ function renderGroups(groups) {
             <div class="no-groups-state">
                 <div class="big-icon">👥</div>
                 <p>Non fai ancora parte di nessun gruppo.</p>
-                <div style="display:flex; gap:0.75rem; justify-content:center; margin-top:1rem; flex-wrap:wrap;">
-                    <button class="btn btn-primary" onclick="switchTab('create')">Crea un gruppo</button>
-                    <button class="btn btn-outline" onclick="switchTab('join')">Entra con codice</button>
+                <div style="display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap;">
+                    <button class="btn btn-primary" onclick="switchTab('create')">➕ Crea un gruppo</button>
+                    <button class="btn btn-outline"  onclick="switchTab('join')">🔑 Entra con codice</button>
                 </div>
             </div>`;
         return;
@@ -84,48 +94,58 @@ function renderGroups(groups) {
 }
 
 function buildGroupCard(g) {
-    const ctx = currentUser.active_context;
+    const ctx      = currentUser.active_context;
     const isActive = ctx && ctx.type === 'group' && ctx.group_id === g.id;
     const isAdmin  = g.role === 'admin';
 
     const inviteHtml = isAdmin && g.invite_code ? `
         <div class="invite-code-box">
-            <span style="font-size:0.78rem; color:var(--text-light);">Codice invito:</span>
+            <span class="invite-code-label">Codice invito:</span>
             <span class="invite-code" id="code-${g.id}">${escapeHtml(g.invite_code)}</span>
-            <button class="btn btn-ghost btn-sm" onclick="copyCode('${escapeHtml(g.invite_code)}')" title="Copia codice">
-                📋
-            </button>
-            <button class="btn btn-ghost btn-sm" onclick="regenerateCode(${g.id})" title="Rigenera codice" style="font-size:0.75rem;">
-                🔄
-            </button>
+            <div class="invite-code-actions">
+                <button class="btn btn-outline btn-sm" onclick="copyCode('${escapeHtml(g.invite_code)}')" title="Copia codice">
+                    📋 Copia
+                </button>
+                <button class="btn btn-ghost btn-sm" onclick="regenerateCode(${g.id})" title="Rigenera codice">
+                    🔄
+                </button>
+            </div>
         </div>` : '';
 
     const switchBtn = isActive
-        ? `<button class="btn btn-outline btn-sm" onclick="switchContext('personal')">↩ Torna al personale</button>`
-        : `<button class="btn btn-primary btn-sm" onclick="switchContext('group', ${g.id})">Attiva contesto</button>`;
+        ? `<button class="btn btn-outline" onclick="switchContext('personal')">↩ Torna al personale</button>`
+        : `<button class="btn btn-primary" onclick="switchContext('group', ${g.id})">✓ Attiva contesto</button>`;
+
+    const activeBadge = isActive
+        ? `<span style="display:inline-block; margin-top:0.3rem; font-size:0.8rem; color:var(--primary); font-weight:700;">● Contesto attivo</span>`
+        : '';
 
     return `
         <div class="group-card" id="group-card-${g.id}">
             <div class="group-card-header">
                 <div>
                     <div class="group-name">${escapeHtml(g.name)}</div>
-                    ${isActive ? '<span class="context-indicator group" style="margin-top:0.25rem;">✓ Contesto attivo</span>' : ''}
+                    ${activeBadge}
                 </div>
                 <span class="role-badge ${g.role}">${g.role === 'admin' ? '👑 Admin' : '👤 Membro'}</span>
             </div>
+
             <div class="group-meta">
                 <span>👥 ${g.member_count} membro${g.member_count !== 1 ? 'i' : ''}</span>
                 <span>📅 Creato il ${formatDate(g.created_at?.split(' ')[0] || '')}</span>
             </div>
+
             ${inviteHtml}
-            <!-- Placeholder lista membri — caricata al click -->
-            <div id="members-${g.id}" style="display:none;"></div>
+
+            <!-- Lista membri (espandibile) -->
+            <div id="members-${g.id}" class="hidden"></div>
+
             <div class="group-actions">
                 ${switchBtn}
-                <button class="btn btn-outline btn-sm" onclick="toggleMembers(${g.id})">
+                <button class="btn btn-outline" onclick="toggleMembers(${g.id})">
                     👥 Membri
                 </button>
-                <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="confirmLeave(${g.id}, '${escapeHtml(g.name)}')">
+                <button class="btn btn-ghost" style="color:var(--danger);" onclick="confirmLeave(${g.id}, '${escapeHtml(g.name)}')">
                     Abbandona
                 </button>
             </div>
@@ -138,11 +158,12 @@ function buildGroupCard(g) {
 
 async function toggleMembers(groupId) {
     const el = document.getElementById(`members-${groupId}`);
-    if (el.style.display === 'block') {
-        el.style.display = 'none';
+    if (!el.classList.contains('hidden')) {
+        el.classList.add('hidden');
         return;
     }
-    el.style.display = 'block';
+
+    el.classList.remove('hidden');
     el.innerHTML = '<div class="loading" style="padding:1rem;"><div class="spinner"></div><span>Caricamento…</span></div>';
 
     try {
@@ -161,25 +182,30 @@ function renderMembersList(container, members, myRole, groupId) {
     const rows = members.map(m => {
         const isMe = m.id === currentUser.id;
         const adminActions = (myRole === 'admin' && !isMe) ? `
-            <div style="display:flex; gap:0.35rem;">
+            <div class="member-actions">
                 ${m.role === 'member'
                     ? `<button class="btn btn-ghost btn-sm" onclick="updateRole(${groupId}, ${m.id}, 'admin')" title="Promuovi ad admin">👑</button>`
                     : `<button class="btn btn-ghost btn-sm" onclick="updateRole(${groupId}, ${m.id}, 'member')" title="Declassa a membro">⬇</button>`
                 }
-                <button class="btn btn-ghost btn-sm" style="color:var(--danger);" onclick="removeMember(${groupId}, ${m.id}, '${escapeHtml(m.username)}')" title="Rimuovi dal gruppo">✕</button>
+                <button class="btn btn-ghost btn-sm" style="color:var(--danger);"
+                    onclick="removeMember(${groupId}, ${m.id}, '${escapeHtml(m.username)}')" title="Rimuovi">✕</button>
             </div>` : '';
 
         return `
             <div class="member-row">
                 <div class="member-avatar">${escapeHtml(m.username[0].toUpperCase())}</div>
-                <span class="member-name">${escapeHtml(m.username)}${isMe ? ' <small style="color:var(--text-muted);">(tu)</small>' : ''}</span>
+                <span class="member-name">
+                    ${escapeHtml(m.username)}
+                    ${isMe ? '<span style="font-size:0.8rem; color:var(--text-muted); font-weight:400;"> (tu)</span>' : ''}
+                </span>
                 <span class="role-badge ${m.role}">${m.role === 'admin' ? '👑 Admin' : '👤 Membro'}</span>
                 ${adminActions}
             </div>`;
     }).join('');
 
     container.innerHTML = `
-        <div class="members-list" style="margin-top:0.75rem; padding-top:0.75rem; border-top:1px solid var(--border-light);">
+        <div class="members-section">
+            <div class="members-section-title">Membri del gruppo</div>
             ${rows}
         </div>`;
 }
@@ -218,7 +244,7 @@ function copyCode(code) {
     navigator.clipboard.writeText(code).then(() => {
         showToast('Codice copiato negli appunti!', 'success');
     }).catch(() => {
-        showToast('Impossibile copiare automaticamente. Codice: ' + code, 'info', 5000);
+        showToast('Codice: ' + code, 'info', 6000);
     });
 }
 
@@ -227,7 +253,8 @@ async function updateRole(groupId, userId, role) {
         const res = await api.post('/groups/update_member.php', { group_id: groupId, user_id: userId, role });
         if (res.success) {
             showToast('Ruolo aggiornato', 'success');
-            await toggleMembers(groupId);
+            const el = document.getElementById(`members-${groupId}`);
+            el.classList.add('hidden');
             await toggleMembers(groupId);
         } else {
             showToast(res.message || 'Errore', 'error');
@@ -333,20 +360,13 @@ async function handleJoin() {
     } catch {
         showToast('Errore di connessione', 'error');
     } finally {
-        btn.disabled = false; btn.textContent = 'Entra';
+        btn.disabled = false; btn.textContent = 'Entra nel gruppo';
     }
 }
 
 // ============================================================
 // UTILITY
 // ============================================================
-
-function switchTab(tabId) {
-    document.querySelectorAll('.pill-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === tabId));
-    document.getElementById('section-my-groups').classList.toggle('hidden', tabId !== 'my-groups');
-    document.getElementById('section-create').classList.toggle('hidden',    tabId !== 'create');
-    document.getElementById('section-join').classList.toggle('hidden',      tabId !== 'join');
-}
 
 function renderActiveContextBar() {
     const ctx = currentUser?.active_context;
@@ -355,13 +375,13 @@ function renderActiveContextBar() {
 
     if (ctx && ctx.type === 'group') {
         bar.innerHTML = `
-            <div class="location-status" style="justify-content:space-between;">
+            <div class="context-bar">
                 <span>Stai visualizzando: <strong>👥 ${escapeHtml(ctx.group_name)}</strong></span>
-                <button class="btn btn-ghost btn-sm" onclick="switchContext('personal')">↩ Torna al personale</button>
+                <button class="btn btn-outline btn-sm" onclick="switchContext('personal')">↩ Torna al personale</button>
             </div>`;
     } else {
         bar.innerHTML = `
-            <div class="location-status">
+            <div class="context-bar">
                 <span>Stai visualizzando: <strong>👤 Dispensa personale</strong></span>
             </div>`;
     }
