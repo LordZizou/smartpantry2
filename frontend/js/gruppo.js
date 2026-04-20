@@ -103,7 +103,7 @@ function buildGroupCard(g) {
             <span class="invite-code-label">Codice invito:</span>
             <span class="invite-code" id="code-${g.id}">${escapeHtml(g.invite_code)}</span>
             <div class="invite-code-actions">
-                <button class="btn btn-outline btn-sm" onclick="copyCode('${escapeHtml(g.invite_code)}')" title="Copia codice">
+                <button class="btn btn-outline btn-sm" onclick="copyCode(document.getElementById('code-${g.id}').textContent.trim())" title="Copia codice">
                     📋 Copia
                 </button>
                 <button class="btn btn-ghost btn-sm" onclick="regenerateCode(${g.id})" title="Rigenera codice">
