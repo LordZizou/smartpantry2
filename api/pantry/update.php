@@ -32,7 +32,7 @@ $groupId = getActiveGroupId();
 
 // Verifica che il prodotto appartenga al contesto corrente
 if ($groupId !== null) {
-    requireGroupMember($userId, $groupId);
+    requireGroupAdmin($userId, $groupId);
     $stmtCheck = $pdo->prepare('SELECT id FROM pantry_items WHERE id = ? AND group_id = ?');
     $stmtCheck->execute([$itemId, $groupId]);
 } else {

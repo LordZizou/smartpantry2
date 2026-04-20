@@ -30,7 +30,7 @@ $groupId = getActiveGroupId();
 
 // Elimina in base al contesto (personale o gruppo)
 if ($groupId !== null) {
-    requireGroupMember($userId, $groupId);
+    requireGroupAdmin($userId, $groupId);
     $stmt = $pdo->prepare('DELETE FROM pantry_items WHERE id = ? AND group_id = ?');
     $stmt->execute([$itemId, $groupId]);
 } else {

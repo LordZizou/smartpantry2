@@ -27,7 +27,7 @@ $userId  = getCurrentUserId();
 $groupId = getActiveGroupId();
 
 if ($groupId !== null) {
-    requireGroupMember($userId, $groupId);
+    requireGroupAdmin($userId, $groupId);
     $stmt = $pdo->prepare('DELETE FROM meal_plans WHERE id = ? AND group_id = ?');
     $stmt->execute([$id, $groupId]);
 } else {
