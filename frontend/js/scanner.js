@@ -15,6 +15,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     initSidebar();
     initLogout();
+
+    const readOnly = user.active_context?.type === 'group' && user.active_context?.role === 'member';
+    if (readOnly) {
+        const content = document.querySelector('.page-content');
+        if (content) {
+            content.innerHTML = `
+                <div class="page-intro"><h2>Aggiungi prodotto</h2></div>
+                <div class="alert alert-info" style="font-size:0.95rem; padding:1.25rem 1.5rem;">
+                    <strong>👁️ Accesso in sola lettura</strong><br>
+                    Stai visualizzando la dispensa del gruppo come <strong>membro</strong>.
+                    Solo gli admin possono aggiungere prodotti al gruppo.<br><br>
+                    <a href="pantry.html" class="btn btn-primary" style="margin-top:0.5rem;">Vai alla dispensa</a>
+                </div>`;
+        }
+        return;
+    }
+
     initScannerTabs();
     initBarcodeScanner();
     initManualBarcodeInput();

@@ -76,7 +76,7 @@ $userId  = getCurrentUserId();
 $groupId = getActiveGroupId();
 
 if ($groupId !== null) {
-    requireGroupMember($userId, $groupId);
+    requireGroupAdmin($userId, $groupId);
 }
 
 // Cerca o crea il prodotto nel catalogo tramite barcode (se fornito)

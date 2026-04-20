@@ -7,6 +7,7 @@ let editingItem   = null;  // Prodotto in modifica
 let currentFilter = 'all'; // Filtro scadenza
 let currentView   = 'expiry'; // 'expiry' | 'category'
 let selectedProduct = null; // Prodotto OF selezionato nel wizard
+let readOnly      = false;  // true se membro (non admin) in contesto gruppo
 
 document.addEventListener('DOMContentLoaded', async () => {
     const user = await requireLogin();
@@ -14,6 +15,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     document.getElementById('sidebar-username').textContent = user.username;
     document.getElementById('sidebar-avatar').textContent   = user.username[0].toUpperCase();
+
+    readOnly = user.active_context?.type === 'group' && user.active_context?.role === 'member';
 
     initSidebar();
     initLogout();
@@ -23,6 +26,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     initAddWizard();
     initEditForm();
     populateCategorySelects();
+
+    if (readOnly) {
+        document.querySelector('.topbar-end .btn-primary')?.remove();
+        const banner = document.createElement('div');
+        banner.className = 'alert alert-info';
+        banner.style.cssText = 'margin-bottom:1rem; font-size:0.88rem;';
+        banner.innerHTML = '👁️ Stai visualizzando la dispensa del gruppo come <strong>membro</strong>. Solo gli admin possono aggiungere o modificare prodotti.';
+        document.querySelector('.page-content')?.prepend(banner);
+    }
+
     await loadPantry();
 });
 
@@ -207,10 +220,11 @@ function buildProductCard(item) {
                     ${expiryBadge}
                 </div>
                 ${nutritionHtml}
+                ${!readOnly ? `
                 <div class="product-actions">
                     <button class="btn btn-outline btn-sm btn-edit" data-id="${item.id}">✏️ Modifica</button>
                     <button class="btn btn-danger btn-sm btn-delete" data-id="${item.id}" data-name="${escapeHtml(item.name)}">🗑️</button>
-                </div>
+                </div>` : ''}
             </div>
         </div>`;
 }
@@ -229,7 +243,7 @@ function buildEmptyState() {
                 <div class="empty-icon">📦</div>
                 <h3>${allItems.length === 0 ? 'La dispensa è vuota' : 'Nessun risultato'}</h3>
                 <p>${allItems.length === 0 ? 'Aggiungi il primo prodotto!' : 'Prova a modificare ricerca o filtri.'}</p>
-                ${allItems.length === 0
+                ${allItems.length === 0 && !readOnly
                     ? '<button class="btn btn-primary" onclick="openAddModal()" style="margin-top:0.5rem;">+ Aggiungi prodotto</button>'
                     : ''}
             </div>`;

@@ -40,7 +40,7 @@ if (empty($title)) {
 
 // Verifica proprietà del pasto in base al contesto
 if ($groupId !== null) {
-    requireGroupMember($userId, $groupId);
+    requireGroupAdmin($userId, $groupId);
     $check = $pdo->prepare('SELECT id FROM meal_plans WHERE id = ? AND group_id = ?');
     $check->execute([$id, $groupId]);
 } else {

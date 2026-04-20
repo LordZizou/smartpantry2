@@ -8,6 +8,7 @@ let currentMonth = new Date().getMonth(); // 0-indexed
 let selectedDate = null;
 let mealsMap     = {}; // { "2026-04-10": [{ id, meal_type, title, ... }, ...] }
 let editingMealId = null;
+let readOnly      = false; // true se membro (non admin) in contesto gruppo
 
 // ---- Costanti ----
 const MONTHS = ['Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno',
@@ -34,8 +35,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (avatarEl)   avatarEl.textContent   = user.username[0].toUpperCase();
     if (usernameEl) usernameEl.textContent = user.username;
 
+    readOnly = user.active_context?.type === 'group' && user.active_context?.role === 'member';
+
     initDrawer();
     initLogout();
+
+    if (readOnly) {
+        const banner = document.createElement('div');
+        banner.className = 'alert alert-info';
+        banner.style.cssText = 'margin-bottom:1rem; font-size:0.88rem;';
+        banner.innerHTML = '👁️ Stai visualizzando il piano pasti del gruppo come <strong>membro</strong>. Solo gli admin possono aggiungere o modificare pasti.';
+        document.querySelector('.page-content')?.prepend(banner);
+    }
 
     // Carica pasti del mese corrente e renderizza il calendario
     await loadMonthMeals();
@@ -223,10 +234,10 @@ function renderDayPanel() {
         html += `<div class="meal-slot">
             <div class="meal-slot-header">
                 <span class="meal-type-label" style="color:${typeInfo.color}">${typeInfo.label}</span>
-                <button class="btn btn-primary btn-sm"
+                ${!readOnly ? `<button class="btn btn-primary btn-sm"
                         onclick="openMealModal('${selectedDate}','${type}',${meal ? meal.id : 'null'})">
                     ${meal ? 'Modifica' : '+ Aggiungi'}
-                </button>
+                </button>` : ''}
             </div>`;
 
         if (meal) {
@@ -237,8 +248,8 @@ function renderDayPanel() {
                 ${meal.recipe_name ? `<div class="meal-recipe">Ricetta: ${escapeHtml(meal.recipe_name)}</div>` : ''}
                 ${chips ? `<div class="meal-ingredients"><span class="meal-ing-label">Ingredienti:</span>${chips}</div>` : ''}
                 ${meal.notes ? `<div class="meal-notes">${escapeHtml(meal.notes)}</div>` : ''}
-                <button class="btn btn-danger btn-sm" style="margin-top:0.6rem;"
-                        onclick="deleteMeal(${meal.id})">Elimina</button>
+                ${!readOnly ? `<button class="btn btn-danger btn-sm" style="margin-top:0.6rem;"
+                        onclick="deleteMeal(${meal.id})">Elimina</button>` : ''}
             </div>`;
         } else {
             html += `<p class="meal-empty">Nessun pasto pianificato</p>`;
