@@ -97,6 +97,11 @@
     background: linear-gradient(160deg, #0a0f14 0%, #0d1117 40%, #0a0d10 100%);
 }
 
+/* Drawer nav-link in dark — drawer è sempre scuro, forza il testo bianco */
+[data-theme="dark"] .nav-link { color: rgba(255,255,255,0.72); }
+[data-theme="dark"] .nav-link:hover { background: rgba(255,255,255,0.08); color: #ffffff; }
+[data-theme="dark"] .nav-link.active { background: rgba(255,255,255,0.12); color: #ffffff; }
+
 /* Topbar in dark */
 [data-theme="dark"] .topbar {
     background: rgba(13,17,23,0.92);
@@ -203,13 +208,14 @@
 [data-theme="dark"] .recipe-image-placeholder { background: #21262d; }
 
 /* Pantry grid cards in dark */
-[data-theme="dark"] .pantry-card  {
+[data-theme="dark"] .product-card {
     background: rgba(22,27,34,0.95);
     border-color: #21262d;
 }
-[data-theme="dark"] .pantry-card:hover { background: rgba(33,38,45,0.98); }
+[data-theme="dark"] .product-card:hover { background: rgba(33,38,45,0.98); }
 [data-theme="dark"] .product-name  { color: #e6edf3; }
 [data-theme="dark"] .product-brand { color: #8b949e; }
+[data-theme="dark"] .product-image-placeholder { background: linear-gradient(135deg, #0f2a1a, #0d1d3a); }
 
 /* Empty state in dark */
 [data-theme="dark"] .empty-state { color: #8b949e; }
