@@ -946,6 +946,26 @@ input, select, textarea {
     margin-top: 0.5rem;
 }
 
+/* Lista ingredienti dettagliata nel popup ricetta */
+.ingredient-detail-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.ing-detail-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.3rem 0.5rem;
+    border-radius: 6px;
+    margin-bottom: 0.2rem;
+    font-size: 0.87rem;
+}
+.ing-detail-item.available { background: rgba(34, 197, 94, 0.09); }
+.ing-detail-item.missing   { background: rgba(239, 68, 68, 0.09); }
+.ing-detail-name   { font-weight: 500; }
+.ing-detail-amount { font-size: 0.8rem; color: var(--text-muted); white-space: nowrap; margin-left: 0.5rem; }
+
 /* Sezione scanner barcode */
 .scanner-container {
     width: 100%;

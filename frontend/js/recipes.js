@@ -2,6 +2,8 @@
  * recipes.js — Ricette consigliate + ricerca per nome
  */
 
+let recipeCache = {}; // cache ricette per ID (usata dal popup dettagli)
+
 document.addEventListener('DOMContentLoaded', async () => {
     const user = await requireLogin();
     if (!user) return;
@@ -24,71 +26,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ============================================================
 
 function initTabs() {
-    // Inizializza date lista spesa
-    const today = new Date();
-    const fmt = d => {
-        const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), dd = String(d.getDate()).padStart(2,'0');
-        return `${y}-${m}-${dd}`;
-    };
-    const startEl = document.getElementById('recipes-shop-start');
-    const endEl   = document.getElementById('recipes-shop-end');
-    if (startEl) startEl.value = fmt(today);
-    if (endEl)   endEl.value   = fmt(new Date(today.getTime() + 6*86400000));
-
-    document.getElementById('btn-recipes-shopping')?.addEventListener('click', loadShoppingFromRecipes);
-
     document.querySelectorAll('.pill-tab').forEach(btn => {
         btn.addEventListener('click', () => {
             const tab = btn.dataset.tab;
             document.querySelectorAll('.pill-tab').forEach(b => b.classList.toggle('active', b === btn));
             document.getElementById('section-suggested').classList.toggle('hidden', tab !== 'suggested');
             document.getElementById('section-search').classList.toggle('hidden',    tab !== 'search');
-            document.getElementById('section-shopping').classList.toggle('hidden',  tab !== 'shopping');
         });
     });
-}
-
-async function loadShoppingFromRecipes() {
-    const start = document.getElementById('recipes-shop-start')?.value;
-    const end   = document.getElementById('recipes-shop-end')?.value;
-    if (!start || !end) { showToast('Seleziona le date', 'warning'); return; }
-
-    const panel = document.getElementById('recipes-shopping-panel');
-    panel.innerHTML = '<div class="loading" style="padding:1.5rem;"><div class="spinner"></div><span>Generazione lista…</span></div>';
-
-    try {
-        const res = await api.get(`/shopping/generate.php?start=${start}&end=${end}`);
-        if (!res.success) {
-            panel.innerHTML = `<div class="alert alert-warning">${escapeHtml(res.message || 'Errore')}</div>`;
-            return;
-        }
-        if (!res.missing.length && !res.available.length) {
-            panel.innerHTML = `<div class="alert alert-info">${escapeHtml(res.message || 'Nessun ingrediente. Pianifica prima i pasti nella sezione Piano pasti.')}</div>`;
-            return;
-        }
-        const label = `Periodo: ${formatDate(start)} — ${formatDate(end)}`;
-
-        panel.innerHTML = `
-            <div class="shopping-export-actions" style="margin-bottom:1rem;">
-                <button class="btn btn-outline btn-sm" id="btn-download-shopping-r">Scarica .txt</button>
-                <button class="btn btn-outline btn-sm" id="btn-print-shopping-r">Stampa</button>
-            </div>
-            ${res.missing.length ? `<div class="shopping-section">
-                <div class="shopping-section-title missing">Da comprare (${res.missing.length})</div>
-                <ul class="shopping-ul">${res.missing.map(i=>`<li class="shopping-item missing">${escapeHtml(i)}</li>`).join('')}</ul>
-            </div>` : ''}
-            ${res.available.length ? `<div class="shopping-section">
-                <div class="shopping-section-title available">Già in dispensa (${res.available.length})</div>
-                <ul class="shopping-ul">${res.available.map(i=>`<li class="shopping-item available">${escapeHtml(i)}</li>`).join('')}</ul>
-            </div>` : ''}`;
-
-        document.getElementById('btn-download-shopping-r')
-            .addEventListener('click', () => downloadShoppingList(res.missing, res.available, label));
-        document.getElementById('btn-print-shopping-r')
-            .addEventListener('click', () => printShoppingList(res.missing, res.available, label));
-    } catch {
-        panel.innerHTML = '<div class="alert alert-warning">Errore nella generazione della lista.</div>';
-    }
 }
 
 // ============================================================
@@ -173,7 +118,6 @@ function initSearchForm() {
     });
 }
 
-/** Avvia la ricerca dal form */
 async function handleSearch() {
     const input = document.getElementById('search-query');
     const query = input?.value?.trim();
@@ -185,22 +129,17 @@ async function handleSearch() {
     await searchRecipes(query);
 }
 
-/** Ricerca rapida tramite chip suggeriti */
 function quickSearch(query) {
     const input = document.getElementById('search-query');
     if (input) input.value = query;
     searchRecipes(query);
 }
 
-/** Effettua la ricerca e renderizza i risultati */
 async function searchRecipes(query) {
-    // Mostra sezione ricerca
     document.querySelectorAll('.pill-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === 'search'));
     document.getElementById('section-suggested').classList.add('hidden');
     document.getElementById('section-search').classList.remove('hidden');
-    document.getElementById('section-shopping').classList.add('hidden');
 
-    // Nascondi suggerimenti e mostra loader
     document.getElementById('search-suggestions').style.display = 'none';
     document.getElementById('search-info').style.display        = 'none';
     document.getElementById('search-loader').style.display      = 'flex';
@@ -228,9 +167,8 @@ async function searchRecipes(query) {
     }
 }
 
-/** Mostra info sui risultati di ricerca */
 function showSearchInfo(query, total, canMakeNow) {
-    const infoEl = document.getElementById('search-info');
+    const infoEl  = document.getElementById('search-info');
     const labelEl = document.getElementById('search-query-label');
     const countEl = document.getElementById('search-count');
 
@@ -244,7 +182,7 @@ function showSearchInfo(query, total, canMakeNow) {
 }
 
 // ============================================================
-// RENDERING CARD RICETTE (condiviso tra suggerite e ricerca)
+// RENDERING CARD RICETTE
 // ============================================================
 
 function renderRecipes(recipes, gridId) {
@@ -261,6 +199,9 @@ function renderRecipes(recipes, gridId) {
             </div>`;
         return;
     }
+
+    // Popola la cache per il popup dettagli
+    recipes.forEach(r => { recipeCache[r.id] = r; });
 
     grid.innerHTML = recipes.map(buildRecipeCard).join('');
 }
@@ -283,7 +224,7 @@ function buildRecipeCard(recipe) {
         ? `<span class="time-badge">⏱ ${recipe.ready_in_minutes} min</span>`
         : '';
 
-    // Lista ingredienti disponibili (max 5)
+    // Ingredienti disponibili (preview, max 5)
     const availableHtml = recipe.used_ingredients?.length > 0
         ? `<h4 class="available">✓ Hai già (${recipe.used_ingredients.length})</h4>
            <ul class="ingredient-list">
@@ -298,7 +239,7 @@ function buildRecipeCard(recipe) {
            </ul>`
         : '';
 
-    // Lista ingredienti mancanti (max 4)
+    // Ingredienti mancanti (preview, max 4)
     const missingHtml = recipe.missed_ingredients?.length > 0
         ? `<h4 class="missing">✕ Mancano (${recipe.missed_ingredients.length})</h4>
            <ul class="ingredient-list">
@@ -313,7 +254,6 @@ function buildRecipeCard(recipe) {
            </ul>`
         : '';
 
-    // Niente ingredienti conosciuti: mostra avviso
     const noIngredients = !recipe.used_ingredients?.length && !recipe.missed_ingredients?.length
         ? `<p style="font-size:0.82rem; color:var(--text-muted); padding:0.5rem 0;">
                Ingredienti non disponibili per questa ricetta.
@@ -345,12 +285,147 @@ function buildRecipeCard(recipe) {
                 <a href="https://spoonacular.com/recipes/-${recipe.id}"
                    target="_blank" rel="noopener noreferrer"
                    class="btn btn-primary btn-sm">🔗 Ricetta completa</a>
-                ${recipe.source_url
-                    ? `<a href="${escapeHtml(recipe.source_url)}" target="_blank" rel="noopener noreferrer"
-                          class="btn btn-secondary btn-sm">Sorgente</a>`
-                    : ''}
+                <button class="btn btn-secondary btn-sm" onclick="openRecipeDetail(${recipe.id})">📋 Ingredienti</button>
             </div>
         </div>`;
+}
+
+// ============================================================
+// POPUP DETTAGLI RICETTA
+// ============================================================
+
+function openRecipeDetail(id) {
+    const recipe = recipeCache[id];
+    if (!recipe) return;
+
+    document.getElementById('recipe-detail-title').textContent = recipe.title;
+    document.getElementById('recipe-detail-body').innerHTML    = buildRecipeDetailHtml(recipe);
+
+    // Lista per download/stampa
+    const missingNames   = (recipe.missed_ingredients || []).map(i =>
+        `${i.amount} ${i.unit} ${i.name}`.trim().replace(/\s+/g, ' '));
+    const availableNames = (recipe.used_ingredients || []).map(i =>
+        `${i.amount} ${i.unit} ${i.name}`.trim().replace(/\s+/g, ' '));
+    const label = recipe.title;
+
+    document.getElementById('btn-dl-recipe-shop')?.addEventListener('click', () =>
+        downloadShoppingList(missingNames, availableNames, label));
+    document.getElementById('btn-print-recipe-shop')?.addEventListener('click', () =>
+        printShoppingList(missingNames, availableNames, label));
+
+    openModal('modal-recipe-detail');
+}
+
+function buildRecipeDetailHtml(recipe) {
+    // Meta info
+    const metaParts = [];
+    if (recipe.ready_in_minutes) metaParts.push(`⏱ ${recipe.ready_in_minutes} min`);
+    if (recipe.servings)         metaParts.push(`🍽️ ${recipe.servings} porzioni`);
+    const metaHtml = metaParts.length
+        ? `<div style="display:flex; gap:1.25rem; margin-bottom:1rem; font-size:0.9rem; color:var(--text-muted);">
+               ${metaParts.map(m => `<span>${m}</span>`).join('')}
+           </div>`
+        : '';
+
+    // Barra compatibilità
+    const compatClass = recipe.compatibility >= 80 ? 'high' : recipe.compatibility >= 50 ? 'medium' : 'low';
+    const compatHtml = `
+        <div class="recipe-compatibility" style="margin-bottom:1.25rem;">
+            <div class="compatibility-bar">
+                <div class="compatibility-fill ${compatClass}" style="width:${recipe.compatibility}%"></div>
+            </div>
+            <span class="compatibility-pct">${recipe.compatibility}% ingredienti disponibili</span>
+        </div>`;
+
+    // Lista completa disponibili
+    const usedHtml = recipe.used_ingredients?.length
+        ? `<div style="margin-bottom:1rem;">
+               <h4 style="color:var(--success); margin-bottom:0.5rem; font-size:0.9rem; font-weight:600;">
+                   ✓ Hai già (${recipe.used_ingredients.length})
+               </h4>
+               <ul class="ingredient-detail-list">
+                   ${recipe.used_ingredients.map(i => `
+                       <li class="ing-detail-item available">
+                           <span class="ing-detail-name">${escapeHtml(i.name)}</span>
+                           <span class="ing-detail-amount">${escapeHtml((`${i.amount} ${i.unit}`).trim())}</span>
+                       </li>`).join('')}
+               </ul>
+           </div>`
+        : '';
+
+    // Lista completa mancanti
+    const missedHtml = recipe.missed_ingredients?.length
+        ? `<div style="margin-bottom:1rem;">
+               <h4 style="color:var(--danger); margin-bottom:0.5rem; font-size:0.9rem; font-weight:600;">
+                   ✕ Mancano (${recipe.missed_ingredients.length})
+               </h4>
+               <ul class="ingredient-detail-list">
+                   ${recipe.missed_ingredients.map(i => `
+                       <li class="ing-detail-item missing">
+                           <span class="ing-detail-name">${escapeHtml(i.name)}</span>
+                           <span class="ing-detail-amount">${escapeHtml((`${i.amount} ${i.unit}`).trim())}</span>
+                       </li>`).join('')}
+               </ul>
+           </div>`
+        : '';
+
+    // Pannello nutrizione
+    let nutritionHtml = '';
+    if (recipe.nutrition) {
+        const n = recipe.nutrition;
+        const srv = n.servings ? `per porzione (${n.servings} porz.)` : 'per porzione';
+        const nutrients = [
+            { label: 'Calorie',     value: n.calories, unit: 'kcal', daily: 2000, color: '#f59e0b' },
+            { label: 'Proteine',    value: n.proteins, unit: 'g',    daily: 50,   color: '#3b82f6' },
+            { label: 'Carboidrati', value: n.carbs,    unit: 'g',    daily: 260,  color: '#8b5cf6' },
+            { label: 'Grassi',      value: n.fats,     unit: 'g',    daily: 70,   color: '#ef4444' },
+            { label: 'Fibre',       value: n.fiber,    unit: 'g',    daily: 25,   color: '#10b981' },
+            { label: 'Sodio',       value: n.sodium,   unit: 'mg',   daily: 2300, color: '#6b7280' },
+        ].filter(item => item.value != null);
+
+        if (nutrients.length) {
+            const rows = nutrients.map(item => {
+                const pct = Math.min(100, Math.round(item.value / item.daily * 100));
+                return `
+                    <div class="nutrient-row">
+                        <span class="nutrient-name">${item.label}</span>
+                        <div class="nutrient-bar-wrap">
+                            <div class="nutrient-bar" style="width:${pct}%; background:${item.color};"></div>
+                        </div>
+                        <span class="nutrient-val">${item.value} ${item.unit}</span>
+                        <span class="nutrient-pct">${pct}%</span>
+                    </div>`;
+            }).join('');
+
+            nutritionHtml = `
+                <div class="nutrition-panel" style="margin-bottom:1rem;">
+                    <div class="nutrition-panel-title">
+                        Valori nutrizionali
+                        <small style="font-weight:400; color:var(--text-light);">${srv}</small>
+                    </div>
+                    ${rows}
+                    <div class="nutrition-footnote">* % rispetto al fabbisogno giornaliero di riferimento</div>
+                </div>`;
+        }
+    }
+
+    // Azioni: lista spesa + link ricetta
+    const hasMissing = (recipe.missed_ingredients?.length ?? 0) > 0;
+    const shoppingActionsHtml = hasMissing
+        ? `<div style="display:flex; gap:0.5rem; flex-wrap:wrap; margin-bottom:0.75rem;">
+               <button class="btn btn-outline btn-sm" id="btn-dl-recipe-shop">📥 Scarica lista spesa</button>
+               <button class="btn btn-outline btn-sm" id="btn-print-recipe-shop">🖨️ Stampa lista spesa</button>
+           </div>`
+        : '';
+
+    const recipeLinkHtml = `
+        <div style="padding-top:0.75rem; border-top:1px solid var(--border-light);">
+            <a href="https://spoonacular.com/recipes/-${recipe.id}"
+               target="_blank" rel="noopener noreferrer"
+               class="btn btn-primary btn-sm">🔗 Vai alla ricetta completa</a>
+        </div>`;
+
+    return metaHtml + compatHtml + usedHtml + missedHtml + nutritionHtml + shoppingActionsHtml + recipeLinkHtml;
 }
 
 // ---- Utility ----
