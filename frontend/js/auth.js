@@ -149,6 +149,11 @@ function clearErrors() {
 function setButtonLoading(btn, loading) {
     if (!btn) return;
     btn.disabled = loading;
-    btn.dataset.originalText = btn.dataset.originalText || btn.textContent;
-    btn.textContent = loading ? 'Caricamento...' : btn.dataset.originalText;
+    // Supporta sia i nuovi auth-btn-primary (con spinner CSS) che i btn generici
+    if (btn.classList.contains('auth-btn-primary')) {
+        btn.classList.toggle('loading', loading);
+    } else {
+        btn.dataset.originalText = btn.dataset.originalText || btn.textContent;
+        btn.textContent = loading ? 'Caricamento...' : btn.dataset.originalText;
+    }
 }
