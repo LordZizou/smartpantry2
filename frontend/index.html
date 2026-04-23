@@ -434,6 +434,154 @@
             color: #9ca3af;
         }
 
+        /* ---- Pulsante tema (fisso in alto a destra) ---- */
+        .theme-toggle {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            z-index: 9999;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.35);
+            background: rgba(255,255,255,0.18);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            cursor: pointer;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+            transition: transform 0.25s cubic-bezier(0.4,0,0.2,1),
+                        background 0.25s, border-color 0.25s,
+                        box-shadow 0.25s;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.12) rotate(18deg);
+            background: rgba(255,255,255,0.28);
+            box-shadow: 0 6px 22px rgba(0,0,0,0.2);
+        }
+        .theme-toggle:active {
+            transform: scale(0.95) rotate(18deg);
+        }
+        #theme-icon {
+            display: block;
+            transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+            line-height: 1;
+        }
+
+        /* ============================================================
+           DARK MODE
+           ============================================================ */
+        @keyframes themeFade {
+            from { opacity: 0.7; }
+            to   { opacity: 1; }
+        }
+
+        [data-theme="dark"] .auth-page {
+            background: #0d1117;
+            animation: themeFade 0.3s ease;
+        }
+
+        /* Pannello form in dark */
+        [data-theme="dark"] .auth-panel {
+            background: #161b22;
+            box-shadow: -8px 0 48px rgba(0,0,0,0.5);
+        }
+        [data-theme="dark"] .panel-header h2 {
+            color: #e6edf3;
+        }
+        [data-theme="dark"] .panel-header p {
+            color: #8b949e;
+        }
+
+        /* Tab in dark */
+        [data-theme="dark"] .auth-tabs {
+            background: #0d1117;
+        }
+        [data-theme="dark"] .auth-tab {
+            color: #8b949e;
+        }
+        [data-theme="dark"] .auth-tab:hover:not(.active) {
+            background: rgba(255,255,255,0.05);
+            color: #c9d1d9;
+        }
+        [data-theme="dark"] .auth-tab.active {
+            background: #21262d;
+            color: #3fb950;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+        }
+
+        /* Form label e input in dark */
+        [data-theme="dark"] .auth-panel .form-label {
+            color: #c9d1d9;
+        }
+        [data-theme="dark"] .auth-panel .form-control {
+            background: #0d1117;
+            border-color: #30363d;
+            color: #e6edf3;
+        }
+        [data-theme="dark"] .auth-panel .form-control:focus {
+            border-color: #3fb950;
+            background: #0d1117;
+            box-shadow: 0 0 0 4px rgba(63,185,80,0.12);
+        }
+        [data-theme="dark"] .auth-panel .form-control::placeholder {
+            color: #484f58;
+        }
+
+        /* Divisore e link in dark */
+        [data-theme="dark"] .auth-divider {
+            color: #484f58;
+        }
+        [data-theme="dark"] .auth-divider::before,
+        [data-theme="dark"] .auth-divider::after {
+            background: #30363d;
+        }
+        [data-theme="dark"] .switch-link { color: #8b949e; }
+        [data-theme="dark"] .switch-link a { color: #3fb950; }
+        [data-theme="dark"] .switch-link a:hover { color: #56d364; }
+
+        /* Hint, strength, footer in dark */
+        [data-theme="dark"] .form-hint { color: #6e7681; }
+        [data-theme="dark"] .strength-label { color: #8b949e; }
+        [data-theme="dark"] .password-strength { background: #21262d; }
+        [data-theme="dark"] .auth-footer { color: #6e7681; }
+
+        /* Errore in dark */
+        [data-theme="dark"] .form-error {
+            background: #2d1515;
+            border-color: #7f1d1d;
+            color: #fca5a5;
+        }
+
+        /* Toggle button in dark */
+        [data-theme="dark"] .theme-toggle {
+            background: rgba(22,27,34,0.9);
+            border-color: #30363d;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        }
+        [data-theme="dark"] .theme-toggle:hover {
+            background: rgba(33,38,45,0.95);
+        }
+
+        /* Transizioni fluide al cambio tema */
+        .auth-panel,
+        .auth-tabs,
+        .auth-tab,
+        .auth-panel .form-control,
+        .auth-panel .form-label,
+        .panel-header h2,
+        .panel-header p,
+        .auth-divider,
+        .switch-link,
+        .auth-footer,
+        .form-hint {
+            transition: background 0.3s ease, color 0.3s ease,
+                        border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
         /* ---- Responsive ---- */
         @media (max-width: 960px) {
             .auth-branding { display: none; }
@@ -442,16 +590,29 @@
                 padding: 2.5rem 1.75rem;
                 box-shadow: none;
                 justify-content: flex-start;
-                padding-top: 4rem;
+                padding-top: 5rem;
             }
         }
         @media (max-width: 480px) {
-            .auth-panel { padding: 2rem 1.25rem; }
+            .auth-panel { padding: 2rem 1.25rem; padding-top: 4.5rem; }
             .panel-header h2 { font-size: 1.7rem; }
+            .theme-toggle { top: 0.75rem; right: 0.75rem; width: 44px; height: 44px; }
         }
     </style>
+    <!-- Applica tema prima del render per evitare flash -->
+    <script>
+        (function() {
+            const t = localStorage.getItem('sp-theme');
+            if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        })();
+    </script>
 </head>
 <body class="auth-page">
+
+    <!-- ===== Toggle tema chiaro/scuro ===== -->
+    <button class="theme-toggle" id="theme-toggle" title="Cambia tema">
+        <span id="theme-icon">🌙</span>
+    </button>
 
     <!-- ===== Pannello sinistro: branding ===== -->
     <section class="auth-branding">
@@ -672,6 +833,32 @@
             btn.classList.remove('loading');
         }
     }
+
+    /* ---- Dark / Light mode ---- */
+    (function initTheme() {
+        const saved = localStorage.getItem('sp-theme') || 'light';
+        applyTheme(saved);
+    })();
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('sp-theme', theme);
+        document.getElementById('theme-icon').textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+
+    document.getElementById('theme-toggle').addEventListener('click', function () {
+        const current = document.documentElement.getAttribute('data-theme') || 'light';
+        const next    = current === 'dark' ? 'light' : 'dark';
+        const icon    = document.getElementById('theme-icon');
+        icon.style.transform  = 'rotate(360deg) scale(0)';
+        icon.style.transition = 'transform 0.2s ease';
+        setTimeout(() => {
+            applyTheme(next);
+            icon.style.transition = 'none';
+            icon.style.transform  = 'scale(1)';
+            requestAnimationFrame(() => { icon.style.transition = ''; });
+        }, 200);
+    });
 
     /* ---- Indicatore forza password ---- */
     function checkPasswordStrength(val) {
