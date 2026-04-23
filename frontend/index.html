@@ -6,253 +6,448 @@
     <title>Smart Pantry — Gestisci la tua dispensa</title>
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* ---- Layout pagina di accesso ---- */
+        /* ========================================================
+           LOGIN PAGE — design moderno e minimalista
+           ======================================================== */
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(28px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        @keyframes ripple {
+            to { transform: scale(4); opacity: 0; }
+        }
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 4px 20px rgba(22,163,74,0.35); }
+            50%       { box-shadow: 0 4px 32px rgba(22,163,74,0.65); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50%       { transform: translateY(-8px); }
+        }
+        @keyframes shimmer {
+            0%   { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        /* ---- Reset pagina ---- */
         .auth-page {
             display: flex;
             min-height: 100vh;
-            background: #f8f9fa;
+            background: #f0fdf4;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
         }
 
-        /* Pannello sinistro: branding */
+        /* ---- Pannello sinistro: branding ---- */
         .auth-branding {
             flex: 1;
-            background: linear-gradient(145deg, #1a5c34 0%, #2d8a4e 55%, #3da860 100%);
+            background: linear-gradient(150deg, #0f4c28 0%, #1a7a3e 45%, #2da855 80%, #3ec866 100%);
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 3rem 3.5rem;
+            padding: 3.5rem 4rem;
             position: relative;
             overflow: hidden;
+            animation: fadeIn 0.8s ease both;
         }
 
-        /* Cerchi decorativi di sfondo */
-        .auth-branding::before,
+        /* Blob decorativi */
+        .auth-branding::before {
+            content: '';
+            position: absolute;
+            width: 500px; height: 500px;
+            top: -160px; right: -160px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+        }
         .auth-branding::after {
             content: '';
             position: absolute;
+            width: 320px; height: 320px;
+            bottom: -80px; left: -100px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.05);
-        }
-        .auth-branding::before {
-            width: 400px; height: 400px;
-            top: -100px; right: -120px;
-        }
-        .auth-branding::after {
-            width: 260px; height: 260px;
-            bottom: -60px; left: -80px;
+            background: radial-gradient(circle, rgba(255,255,255,0.06) 0%, transparent 70%);
         }
 
-        .brand-content { position: relative; z-index: 1; }
+        /* Pallino decorativo in mezzo */
+        .brand-blob {
+            position: absolute;
+            width: 200px; height: 200px;
+            top: 50%; left: 30%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+        }
 
+        .brand-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Logo */
         .brand-logo {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            margin-bottom: 2.5rem;
+            gap: 1.1rem;
+            margin-bottom: 3rem;
         }
         .brand-logo .icon {
-            font-size: 3rem;
-            background: rgba(255,255,255,0.15);
-            border-radius: 18px;
-            width: 70px; height: 70px;
+            font-size: 2.6rem;
+            background: rgba(255,255,255,0.18);
+            border-radius: 22px;
+            width: 72px; height: 72px;
             display: flex; align-items: center; justify-content: center;
-            backdrop-filter: blur(4px);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.25);
+            animation: float 4s ease-in-out infinite;
         }
         .brand-logo h1 {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-weight: 800;
             color: #fff;
             line-height: 1.1;
+            letter-spacing: -0.02em;
         }
         .brand-logo p {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
-            margin-top: 0.25rem;
+            color: rgba(255,255,255,0.65);
+            font-size: 0.95rem;
+            margin-top: 0.2rem;
         }
 
         .brand-tagline {
-            font-size: 1.55rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: #fff;
-            line-height: 1.35;
-            margin-bottom: 1rem;
+            line-height: 1.3;
+            margin-bottom: 0.9rem;
+            letter-spacing: -0.01em;
         }
         .brand-sub {
-            color: rgba(255,255,255,0.75);
-            font-size: 1rem;
-            line-height: 1.6;
-            margin-bottom: 2.5rem;
+            color: rgba(255,255,255,0.72);
+            font-size: 1.05rem;
+            line-height: 1.65;
+            margin-bottom: 2.75rem;
         }
 
-        /* Features list */
-        .features { display: flex; flex-direction: column; gap: 1rem; }
+        /* Feature list */
+        .features { display: flex; flex-direction: column; gap: 0.85rem; }
 
         .feature-item {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 1rem;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 14px;
-            padding: 1rem 1.25rem;
-            backdrop-filter: blur(4px);
-            transition: background 0.2s;
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.13);
+            border-radius: 18px;
+            padding: 1rem 1.4rem;
+            backdrop-filter: blur(6px);
+            transition: background 0.25s, transform 0.25s;
+            cursor: default;
         }
-        .feature-item:hover { background: rgba(255,255,255,0.14); }
-
+        .feature-item:hover {
+            background: rgba(255,255,255,0.14);
+            transform: translateX(4px);
+        }
         .feature-icon {
-            font-size: 1.6rem;
+            font-size: 1.7rem;
             flex-shrink: 0;
-            margin-top: 0.1rem;
+            filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));
         }
         .feature-text h3 {
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 700;
             color: #fff;
-            margin-bottom: 0.2rem;
+            margin-bottom: 0.15rem;
         }
         .feature-text p {
-            font-size: 0.82rem;
-            color: rgba(255,255,255,0.65);
-            line-height: 1.4;
+            font-size: 0.86rem;
+            color: rgba(255,255,255,0.62);
+            line-height: 1.45;
         }
 
-        /* Pannello destro: form */
+        /* ---- Pannello destro: form ---- */
         .auth-panel {
-            width: 460px;
+            width: 500px;
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
             justify-content: center;
             background: #fff;
-            padding: 3rem 2.75rem;
-            box-shadow: -4px 0 40px rgba(0,0,0,0.07);
+            padding: 3.5rem 3.25rem;
+            box-shadow: -8px 0 48px rgba(0,0,0,0.06);
+            overflow-y: auto;
+            animation: slideUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
         }
 
-        .panel-header { margin-bottom: 2rem; }
+        /* Header pannello */
+        .panel-header {
+            margin-bottom: 2.25rem;
+        }
         .panel-header h2 {
-            font-size: 1.6rem;
+            font-size: 2rem;
             font-weight: 800;
-            color: var(--text);
-            margin-bottom: 0.35rem;
+            color: #111827;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.02em;
+            line-height: 1.2;
         }
         .panel-header p {
-            color: var(--text-light);
-            font-size: 0.9rem;
+            color: #6b7280;
+            font-size: 1rem;
+            line-height: 1.5;
         }
 
-        /* Tab stile pillola */
+        /* ---- Tab pillola ---- */
         .auth-tabs {
             display: flex;
-            background: var(--bg);
-            border-radius: 10px;
-            padding: 4px;
-            margin-bottom: 1.75rem;
-            border: none;
+            background: #f3f4f6;
+            border-radius: 14px;
+            padding: 5px;
+            margin-bottom: 2rem;
             gap: 4px;
         }
         .auth-tab {
             flex: 1;
-            padding: 0.6rem 1rem;
+            padding: 0.65rem 1rem;
             background: transparent;
             border: none;
-            border-radius: 7px;
-            font-size: 0.9rem;
+            border-radius: 10px;
+            font-size: 0.97rem;
             font-weight: 600;
-            color: var(--text-light);
+            color: #6b7280;
             cursor: pointer;
-            transition: all 0.2s;
-            margin: 0;
+            transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .auth-tab:hover:not(.active) {
+            color: #374151;
+            background: rgba(255,255,255,0.6);
         }
         .auth-tab.active {
             background: #fff;
             color: var(--primary);
-            box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
         }
 
-        /* Form */
+        /* ---- Form generico ---- */
         .hidden { display: none !important; }
 
+        .auth-form {
+            animation: slideUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        }
+
+        /* Label più grandi */
+        .auth-panel .form-label {
+            font-size: 0.97rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Input più grandi e arrotondati */
+        .auth-panel .form-control {
+            height: 54px;
+            padding: 0 1.1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 14px;
+            font-size: 1.02rem;
+            color: #111827;
+            background: #fafafa;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            outline: none;
+        }
+        .auth-panel .form-control:focus {
+            border-color: #16a34a;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(22,163,74,0.1);
+        }
+        .auth-panel .form-control::placeholder {
+            color: #9ca3af;
+            font-size: 0.97rem;
+        }
+
+        /* Input con icona — padding sinistra */
+        .input-icon-wrap { position: relative; }
+        .input-icon-wrap .form-control { padding-left: 3rem; }
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            pointer-events: none;
+            line-height: 1;
+        }
+
+        /* Errore form */
         .form-error {
-            background: var(--danger-bg);
-            border: 1px solid #ef9a9a;
-            border-radius: var(--radius-sm);
-            color: #c62828;
-            padding: 0.65rem 0.9rem;
-            font-size: 0.875rem;
-            margin-bottom: 1rem;
+            background: #fef2f2;
+            border: 1.5px solid #fca5a5;
+            border-radius: 12px;
+            color: #dc2626;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            margin-bottom: 1.25rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.6rem;
+            animation: slideUp 0.25s ease both;
         }
-        .form-error::before { content: '⚠️'; font-size: 1rem; }
+        .form-error::before { content: '⚠️'; font-size: 1.05rem; flex-shrink: 0; }
 
+        /* Divisore "oppure" */
         .auth-divider {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            margin: 1.25rem 0;
-            color: var(--text-muted);
-            font-size: 0.82rem;
+            gap: 1rem;
+            margin: 1.4rem 0;
+            color: #9ca3af;
+            font-size: 0.9rem;
         }
         .auth-divider::before,
         .auth-divider::after {
             content: '';
             flex: 1;
             height: 1px;
-            background: var(--border);
+            background: #e5e7eb;
         }
 
-        /* Input con icona */
-        .input-icon-wrap { position: relative; }
-        .input-icon-wrap .form-control { padding-left: 2.6rem; }
-        .input-icon {
+        /* ---- Pulsanti con animazioni ---- */
+        .auth-btn-primary {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+            height: 54px;
+            background: linear-gradient(135deg, #16a34a, #15803d);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.01em;
+            margin-top: 0.5rem;
+            transition: transform 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.18s cubic-bezier(0.4, 0, 0.2, 1),
+                        background 0.18s;
+            box-shadow: 0 4px 14px rgba(22,163,74,0.35);
+        }
+        .auth-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(22,163,74,0.45);
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+        }
+        .auth-btn-primary:active {
+            transform: translateY(0px) scale(0.98);
+            box-shadow: 0 2px 8px rgba(22,163,74,0.3);
+        }
+        .auth-btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Ripple effect */
+        .ripple-circle {
             position: absolute;
-            left: 0.9rem;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1rem;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.35);
+            width: 80px; height: 80px;
+            margin-top: -40px; margin-left: -40px;
+            animation: ripple 0.6s linear;
             pointer-events: none;
         }
 
-        /* Footer della pagina */
-        .auth-footer {
-            margin-top: 1.5rem;
-            text-align: center;
-            font-size: 0.8rem;
-            color: var(--text-muted);
+        /* Testo nel bottone con freccia animata */
+        .auth-btn-primary .btn-text { display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+        .auth-btn-primary .btn-arrow {
+            display: inline-block;
+            transition: transform 0.2s;
         }
+        .auth-btn-primary:hover .btn-arrow { transform: translateX(4px); }
 
-        /* Password strength indicator */
+        /* Loading spinner nel bottone */
+        .auth-btn-primary.loading .btn-text { display: none; }
+        .auth-btn-primary .btn-spinner {
+            display: none;
+            width: 22px; height: 22px;
+            border: 3px solid rgba(255,255,255,0.35);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        .auth-btn-primary.loading .btn-spinner { display: block; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Link tab switch */
+        .switch-link {
+            text-align: center;
+            font-size: 0.95rem;
+            color: #6b7280;
+        }
+        .switch-link a {
+            font-weight: 700;
+            color: #16a34a;
+            text-decoration: none;
+            transition: color 0.15s;
+        }
+        .switch-link a:hover { color: #15803d; text-decoration: underline; }
+
+        /* Hint e strength */
+        .form-hint {
+            font-size: 0.82rem;
+            color: #9ca3af;
+            margin-top: 0.3rem;
+        }
         .password-strength {
-            height: 4px;
-            border-radius: 2px;
-            margin-top: 0.4rem;
-            background: var(--border);
+            height: 5px;
+            border-radius: 3px;
+            margin-top: 0.5rem;
+            background: #e5e7eb;
             overflow: hidden;
         }
         .strength-fill {
             height: 100%;
-            border-radius: 2px;
-            transition: width 0.3s, background 0.3s;
+            border-radius: 3px;
+            transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), background 0.35s;
             width: 0%;
         }
-        .strength-fill.weak   { background: var(--danger);  width: 33%; }
-        .strength-fill.medium { background: var(--warning); width: 66%; }
-        .strength-fill.strong { background: var(--success); width: 100%; }
+        .strength-fill.weak   { background: #ef4444; width: 33%; }
+        .strength-fill.medium { background: #f59e0b; width: 66%; }
+        .strength-fill.strong { background: #22c55e; width: 100%; }
         .strength-label {
-            font-size: 0.75rem;
-            margin-top: 0.25rem;
-            color: var(--text-light);
+            font-size: 0.8rem;
+            margin-top: 0.3rem;
+            color: #6b7280;
+            min-height: 1.2em;
         }
 
-        /* Responsive: nasconde il branding su schermi piccoli */
-        @media (max-width: 900px) {
+        /* Footer */
+        .auth-footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.82rem;
+            color: #9ca3af;
+        }
+
+        /* ---- Responsive ---- */
+        @media (max-width: 960px) {
             .auth-branding { display: none; }
-            .auth-panel    { width: 100%; padding: 2rem 1.5rem; box-shadow: none; }
+            .auth-panel {
+                width: 100%;
+                padding: 2.5rem 1.75rem;
+                box-shadow: none;
+                justify-content: flex-start;
+                padding-top: 4rem;
+            }
         }
         @media (max-width: 480px) {
-            .auth-panel { padding: 1.5rem 1.25rem; }
+            .auth-panel { padding: 2rem 1.25rem; }
+            .panel-header h2 { font-size: 1.7rem; }
         }
     </style>
 </head>
@@ -260,7 +455,9 @@
 
     <!-- ===== Pannello sinistro: branding ===== -->
     <section class="auth-branding">
+        <div class="brand-blob"></div>
         <div class="brand-content">
+
             <div class="brand-logo">
                 <div class="icon">🥦</div>
                 <div>
@@ -280,36 +477,38 @@
                     <span class="feature-icon">📦</span>
                     <div class="feature-text">
                         <h3>Dispensa digitale</h3>
-                        <p>Aggiungi prodotti manualmente o scansionando il barcode in un secondo.</p>
+                        <p>Aggiungi prodotti manualmente o scansionando il barcode.</p>
                     </div>
                 </div>
                 <div class="feature-item">
                     <span class="feature-icon">⏰</span>
                     <div class="feature-text">
                         <h3>Avvisi scadenza</h3>
-                        <p>Ricevi notifiche quando un prodotto sta per scadere. Niente sprechi.</p>
+                        <p>Notifiche prima che i prodotti scadano. Niente sprechi.</p>
                     </div>
                 </div>
                 <div class="feature-item">
                     <span class="feature-icon">🍽️</span>
                     <div class="feature-text">
                         <h3>Ricette su misura</h3>
-                        <p>Ricevi suggerimenti basati su quello che hai, cerca qualsiasi piatto.</p>
+                        <p>Suggerimenti basati su quello che hai in dispensa.</p>
                     </div>
                 </div>
                 <div class="feature-item">
                     <span class="feature-icon">📷</span>
                     <div class="feature-text">
                         <h3>Scanner barcode</h3>
-                        <p>Dati nutrizionali e prodotto trovati automaticamente tramite OpenFoodFacts.</p>
+                        <p>Valori nutrizionali trovati in automatico via OpenFoodFacts.</p>
                     </div>
                 </div>
             </div>
+
         </div>
     </section>
 
     <!-- ===== Pannello destro: form ===== -->
     <section class="auth-panel">
+
         <div class="panel-header">
             <h2 id="panel-title">Bentornato 👋</h2>
             <p id="panel-sub">Accedi al tuo account per gestire la dispensa.</p>
@@ -343,15 +542,16 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top: 0.5rem;">
-                Accedi →
+            <button type="submit" class="auth-btn-primary" id="btn-login-submit">
+                <span class="btn-text">Accedi <span class="btn-arrow">→</span></span>
+                <span class="btn-spinner"></span>
             </button>
 
             <div class="auth-divider">oppure</div>
 
-            <p style="text-align:center; font-size: 0.88rem; color: var(--text-light);">
+            <p class="switch-link">
                 Non hai un account?
-                <a href="#" onclick="switchTab('register')" style="font-weight: 700;">Registrati gratis</a>
+                <a href="#" onclick="switchTab('register'); return false;">Registrati gratis</a>
             </p>
         </form>
 
@@ -364,7 +564,8 @@
                 <div class="input-icon-wrap">
                     <span class="input-icon">👤</span>
                     <input class="form-control" type="text" id="reg-username"
-                           placeholder="mario_rossi" autocomplete="username" required minlength="3" maxlength="50">
+                           placeholder="mario_rossi" autocomplete="username"
+                           required minlength="3" maxlength="50">
                 </div>
                 <div class="form-hint">Da 3 a 50 caratteri, senza spazi</div>
             </div>
@@ -386,7 +587,9 @@
                            placeholder="Minimo 6 caratteri" autocomplete="new-password"
                            required minlength="6" oninput="checkPasswordStrength(this.value)">
                 </div>
-                <div class="password-strength"><div class="strength-fill" id="strength-fill"></div></div>
+                <div class="password-strength">
+                    <div class="strength-fill" id="strength-fill"></div>
+                </div>
                 <div class="strength-label" id="strength-label"></div>
             </div>
 
@@ -399,15 +602,16 @@
                 </div>
             </div>
 
-            <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top: 0.5rem;">
-                Crea account →
+            <button type="submit" class="auth-btn-primary" id="btn-register-submit">
+                <span class="btn-text">Crea account <span class="btn-arrow">→</span></span>
+                <span class="btn-spinner"></span>
             </button>
 
             <div class="auth-divider">oppure</div>
 
-            <p style="text-align:center; font-size: 0.88rem; color: var(--text-light);">
+            <p class="switch-link">
                 Hai già un account?
-                <a href="#" onclick="switchTab('login')" style="font-weight: 700;">Accedi</a>
+                <a href="#" onclick="switchTab('login'); return false;">Accedi</a>
             </p>
         </form>
 
@@ -419,16 +623,24 @@
 <script src="js/api.js"></script>
 <script src="js/auth.js"></script>
 <script>
-    /** Aggiorna i titoli del pannello al cambio tab */
+    /* ---- Testi pannello per tab ---- */
     const panelTitles = {
         login:    ['Bentornato 👋',       'Accedi al tuo account per gestire la dispensa.'],
         register: ['Crea il tuo account', 'Registrati gratis e inizia subito a gestire la dispensa.']
     };
 
     function switchTab(tab) {
-        document.querySelectorAll('.auth-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+        document.querySelectorAll('.auth-tab').forEach(t =>
+            t.classList.toggle('active', t.dataset.tab === tab));
         document.querySelectorAll('.auth-form').forEach(f => f.classList.add('hidden'));
-        document.getElementById(`form-${tab}`)?.classList.remove('hidden');
+        const form = document.getElementById(`form-${tab}`);
+        if (form) {
+            form.classList.remove('hidden');
+            // Restart animation
+            form.style.animation = 'none';
+            form.offsetHeight; // reflow
+            form.style.animation = '';
+        }
         document.getElementById('panel-title').textContent = panelTitles[tab][0];
         document.getElementById('panel-sub').textContent   = panelTitles[tab][1];
     }
@@ -437,17 +649,55 @@
         btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
 
-    /** Indicatore forza password */
+    /* ---- Ripple sui pulsanti ---- */
+    document.querySelectorAll('.auth-btn-primary').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const rect   = this.getBoundingClientRect();
+            const circle = document.createElement('span');
+            circle.className = 'ripple-circle';
+            circle.style.left = (e.clientX - rect.left) + 'px';
+            circle.style.top  = (e.clientY - rect.top)  + 'px';
+            this.appendChild(circle);
+            circle.addEventListener('animationend', () => circle.remove());
+        });
+    });
+
+    /* ---- Loading state dei pulsanti (override auth.js) ---- */
+    function setButtonLoading(btn, loading) {
+        if (!btn) return;
+        btn.disabled = loading;
+        if (loading) {
+            btn.classList.add('loading');
+        } else {
+            btn.classList.remove('loading');
+        }
+    }
+
+    /* ---- Indicatore forza password ---- */
     function checkPasswordStrength(val) {
         const fill  = document.getElementById('strength-fill');
         const label = document.getElementById('strength-label');
         if (!fill || !label) return;
-        if (val.length === 0) { fill.className = 'strength-fill'; fill.style.width = '0'; label.textContent = ''; return; }
+        if (!val) {
+            fill.className = 'strength-fill';
+            label.textContent = '';
+            return;
+        }
         const strong = val.length >= 10 && /[A-Z]/.test(val) && /[0-9]/.test(val) && /[^A-Za-z0-9]/.test(val);
         const medium = val.length >= 6  && (/[A-Z]/.test(val) || /[0-9]/.test(val));
-        if (strong) { fill.className = 'strength-fill strong'; label.textContent = '✓ Password forte'; }
-        else if (medium) { fill.className = 'strength-fill medium'; label.textContent = 'Password media — aggiungi numeri o simboli'; }
-        else { fill.className = 'strength-fill weak'; label.textContent = 'Password debole'; }
+        if (strong) {
+            fill.className = 'strength-fill strong';
+            label.textContent = '✓ Password forte';
+            label.style.color = '#16a34a';
+        } else if (medium) {
+            fill.className = 'strength-fill medium';
+            label.textContent = 'Password media — aggiungi numeri o simboli';
+            label.style.color = '#d97706';
+        } else {
+            fill.className = 'strength-fill weak';
+            label.textContent = 'Password debole';
+            label.style.color = '#dc2626';
+        }
     }
 </script>
 </body>
