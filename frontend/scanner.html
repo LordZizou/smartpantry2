@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Pantry — Aggiungi prodotto</title>
     <link rel="stylesheet" href="css/style.css">
+    <script>(function(){var t=localStorage.getItem("sp-theme");if(t)document.documentElement.setAttribute("data-theme",t);})();</script>
     <style>
         .hidden { display: none !important; }
 
@@ -108,7 +109,8 @@
             <span></span><span></span><span></span>
         </button>
         <h1 class="page-title">Aggiungi prodotto</h1>
-        <div class="topbar-end"></div>
+        <div class="topbar-end">
+            <button class="theme-toggle-app" id="theme-toggle" title="Tema"><span id="theme-icon">🌙</span></button></div>
     </header>
 
     <main class="page-content">
@@ -199,5 +201,6 @@
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="js/api.js"></script>
 <script src="js/scanner.js"></script>
+<script src="js/theme.js"></script>
 </body>
 </html>

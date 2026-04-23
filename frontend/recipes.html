@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Pantry — Ricette</title>
     <link rel="stylesheet" href="css/style.css">
+    <script>(function(){var t=localStorage.getItem("sp-theme");if(t)document.documentElement.setAttribute("data-theme",t);})();</script>
     <style>
         .hidden { display: none !important; }
         .border-success { border-top: 3px solid var(--success); }
@@ -47,6 +48,7 @@
         </button>
         <h1 class="page-title">Ricette</h1>
         <div class="topbar-end">
+            <button class="theme-toggle-app" id="theme-toggle" title="Tema"><span id="theme-icon">🌙</span></button>
             <button id="btn-reload" class="btn btn-outline btn-sm">Aggiorna</button>
         </div>
     </header>
@@ -159,5 +161,6 @@
 
 <script src="js/api.js"></script>
 <script src="js/recipes.js"></script>
+<script src="js/theme.js"></script>
 </body>
 </html>

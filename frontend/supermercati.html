@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Pantry — Supermercati vicini</title>
     <link rel="stylesheet" href="css/style.css">
+    <script>(function(){var t=localStorage.getItem("sp-theme");if(t)document.documentElement.setAttribute("data-theme",t);})();</script>
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <style>
@@ -213,6 +214,7 @@
             <span></span><span></span><span></span>
         </button>
         <h1 class="page-title">🗺️ Supermercati vicini</h1>
+        <div class="topbar-end"><button class="theme-toggle-app" id="theme-toggle" title="Tema"><span id="theme-icon">🌙</span></button></div>
     </header>
 
     <main class="page-content">
@@ -266,5 +268,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="js/api.js"></script>
 <script src="js/supermercati.js"></script>
+<script src="js/theme.js"></script>
 </body>
 </html>

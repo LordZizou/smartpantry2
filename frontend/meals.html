@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Pantry — Piano pasti</title>
     <link rel="stylesheet" href="css/style.css">
+    <script>(function(){var t=localStorage.getItem("sp-theme");if(t)document.documentElement.setAttribute("data-theme",t);})();</script>
     <style>
         .hidden { display: none !important; }
 
@@ -305,6 +306,7 @@
         </button>
         <h1 class="page-title">Piano pasti</h1>
         <div class="topbar-end">
+            <button class="theme-toggle-app" id="theme-toggle" title="Tema"><span id="theme-icon">🌙</span></button>
             <button class="btn btn-outline btn-sm" id="btn-today">Oggi</button>
         </div>
     </header>
@@ -426,5 +428,6 @@
 
 <script src="js/api.js"></script>
 <script src="js/meals.js"></script>
+<script src="js/theme.js"></script>
 </body>
 </html>
