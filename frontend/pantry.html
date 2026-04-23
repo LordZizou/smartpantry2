@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Smart Pantry — La mia dispensa</title>
     <link rel="stylesheet" href="css/style.css">
+    <script>(function(){var t=localStorage.getItem("sp-theme");if(t)document.documentElement.setAttribute("data-theme",t);})();</script>
     <style>
         .hidden { display: none !important; }
     </style>
@@ -45,6 +46,7 @@
         </button>
         <h1 class="page-title">Dispensa</h1>
         <div class="topbar-end">
+            <button class="theme-toggle-app" id="theme-toggle" title="Tema"><span id="theme-icon">🌙</span></button>
             <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Aggiungi</button>
         </div>
     </header>
@@ -310,5 +312,6 @@
 
 <script src="js/api.js"></script>
 <script src="js/pantry.js"></script>
+<script src="js/theme.js"></script>
 </body>
 </html>
