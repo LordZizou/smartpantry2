@@ -70,7 +70,7 @@ async function apiCall(endpoint, method = 'GET', body = null) {
 
     // Reindirizza al login se la sessione è scaduta
     if (response.status === 401 && !window.location.pathname.includes('index.html')) {
-        window.location.href = '../index.html';
+        window.location.href = 'index.html';
         return;
     }
 
@@ -108,7 +108,7 @@ async function getCurrentUser() {
 async function requireLogin() {
     const user = await getCurrentUser();
     if (!user) {
-        window.location.href = '../index.html';
+        window.location.href = 'index.html';
         return null;
     }
     initContextSwitcher(user);

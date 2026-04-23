@@ -479,6 +479,6 @@ async function generateShoppingList() {
 function initLogout() {
     document.getElementById('btn-logout')?.addEventListener('click', async () => {
         await api.post('/auth/logout.php');
-        window.location.href = '../index.html';
+        window.location.href = 'index.html';
     });
 }
