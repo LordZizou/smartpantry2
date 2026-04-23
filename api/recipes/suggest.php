@@ -64,20 +64,35 @@ if (empty($recipes)) {
     ]);
 }
 
-// Passo 3: costruisci le ricette con ingredienti disponibili/mancanti
+// Passo 3: recupera dettagli completi (tempo, porzioni, nutrizione)
+$recipeIds   = array_column($recipes, 'id');
+$detailsData = spoonacularGet('/recipes/informationBulk', [
+    'ids'              => implode(',', $recipeIds),
+    'includeNutrition' => 'true',
+]);
+
+$details = [];
+if (is_array($detailsData)) {
+    foreach ($detailsData as $d) {
+        $details[$d['id']] = $d;
+    }
+}
+
+// Passo 4: costruisci le ricette con ingredienti disponibili/mancanti
 $pantryNormalized = array_map('strtolower', array_map('trim', $pantryItems));
 
 $formattedRecipes = [];
 
 foreach ($recipes as $recipe) {
+    $detail = $details[$recipe['id']] ?? null;
+
     // Ingredienti usati dalla dispensa
     $usedIngredients = [];
     foreach ($recipe['usedIngredients'] ?? [] as $ing) {
         $usedIngredients[] = [
-            'name'     => $ing['name'],
-            'amount'   => $ing['amount'],
-            'unit'     => $ing['unit'],
-            'image'    => $ing['image'] ?? null
+            'name'   => $ing['name'],
+            'amount' => $ing['amount'],
+            'unit'   => $ing['unit'],
         ];
     }
 
@@ -85,10 +100,9 @@ foreach ($recipes as $recipe) {
     $missedIngredients = [];
     foreach ($recipe['missedIngredients'] ?? [] as $ing) {
         $missedIngredients[] = [
-            'name'     => $ing['name'],
-            'amount'   => $ing['amount'],
-            'unit'     => $ing['unit'],
-            'image'    => $ing['image'] ?? null
+            'name'   => $ing['name'],
+            'amount' => $ing['amount'],
+            'unit'   => $ing['unit'],
         ];
     }
 
@@ -98,20 +112,41 @@ foreach ($recipes as $recipe) {
         ? round(count($usedIngredients) / $totalIngredients * 100)
         : 0;
 
+    // Estrai dati nutrizionali
+    $nutrition = null;
+    if (isset($detail['nutrition']['nutrients'])) {
+        $lookup = [];
+        foreach ($detail['nutrition']['nutrients'] as $n) {
+            $lookup[$n['name']] = round((float)$n['amount'], 1);
+        }
+        $nutrition = [
+            'calories' => $lookup['Calories']      ?? null,
+            'proteins' => $lookup['Protein']       ?? null,
+            'carbs'    => $lookup['Carbohydrates'] ?? null,
+            'fats'     => $lookup['Fat']           ?? null,
+            'fiber'    => $lookup['Fiber']         ?? null,
+            'sodium'   => $lookup['Sodium']        ?? null,
+            'servings' => $detail['servings']      ?? null,
+        ];
+    }
+
     $formattedRecipes[] = [
-        'id'                  => $recipe['id'],
-        'title'               => $recipe['title'],
-        'image'               => $recipe['image']          ?? null,
+        'id'                      => $recipe['id'],
+        'title'                   => $recipe['title'],
+        'image'                   => $recipe['image']                ?? null,
+        'ready_in_minutes'        => $detail['readyInMinutes']       ?? null,
+        'servings'                => $detail['servings']             ?? null,
         'used_ingredient_count'   => (int) ($recipe['usedIngredientCount']   ?? 0),
         'missed_ingredient_count' => (int) ($recipe['missedIngredientCount'] ?? 0),
-        'used_ingredients'    => $usedIngredients,
-        'missed_ingredients'  => $missedIngredients,
-        'compatibility'       => $compatibility, // percentuale 0-100
-        'can_make_now'        => count($missedIngredients) === 0
+        'used_ingredients'        => $usedIngredients,
+        'missed_ingredients'      => $missedIngredients,
+        'compatibility'           => $compatibility,
+        'can_make_now'            => count($missedIngredients) === 0,
+        'nutrition'               => $nutrition,
     ];
 }
 
-// Passo 5: ordina le ricette
+// Passo 5: ordina per fattibilità e compatibilità
 // Prima quelle realizzabili subito, poi per compatibilità decrescente
 usort($formattedRecipes, function ($a, $b) {
     // Prima le ricette fattibili subito

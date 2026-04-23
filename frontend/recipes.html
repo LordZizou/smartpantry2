@@ -63,7 +63,6 @@
         <div class="pill-tabs">
             <button class="pill-tab active" data-tab="suggested">Consigliate</button>
             <button class="pill-tab" data-tab="search">Cerca ricetta</button>
-            <button class="pill-tab" data-tab="shopping">Lista spesa</button>
         </div>
 
         <!-- ===== SEZIONE: RICETTE CONSIGLIATE ===== -->
@@ -144,32 +143,18 @@
             <div class="recipes-grid" id="search-grid"></div>
         </div>
 
-        <!-- ===== SEZIONE: LISTA SPESA ===== -->
-        <div id="section-shopping" class="hidden">
-            <div class="page-intro" style="margin-bottom:1.25rem;">
-                <h2>Lista della spesa</h2>
-                <p>Genera automaticamente la lista degli ingredienti mancanti in base ai pasti pianificati.</p>
-            </div>
-
-            <div class="card" style="margin-bottom:1.25rem;">
-                <div class="card-header">
-                    <span class="card-title">Seleziona periodo</span>
-                </div>
-                <div class="card-body">
-                    <div style="display:flex; gap:0.75rem; align-items:center; flex-wrap:wrap;">
-                        <input type="date" class="form-control" id="recipes-shop-start" style="width:175px;">
-                        <span style="color:var(--text-muted);">—</span>
-                        <input type="date" class="form-control" id="recipes-shop-end"   style="width:175px;">
-                        <button class="btn btn-primary" id="btn-recipes-shopping">Genera lista</button>
-                        <a href="meals.html" class="btn btn-outline btn-sm">Vai al piano pasti</a>
-                    </div>
-                </div>
-            </div>
-
-            <div id="recipes-shopping-panel"></div>
-        </div>
-
     </main>
+</div>
+
+<!-- ===== MODAL: Dettagli ricetta ===== -->
+<div class="modal-overlay" id="modal-recipe-detail">
+    <div class="modal" style="max-width:620px;">
+        <div class="modal-header">
+            <span class="modal-title" id="recipe-detail-title">Dettagli ricetta</span>
+            <button class="modal-close" onclick="closeModal('modal-recipe-detail')">×</button>
+        </div>
+        <div class="modal-body" id="recipe-detail-body" style="max-height:75vh; overflow-y:auto;"></div>
+    </div>
 </div>
 
 <script src="js/api.js"></script>

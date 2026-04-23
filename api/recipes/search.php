@@ -73,7 +73,7 @@ $recipeIds = array_column($results, 'id');
 
 $bulkData = spoonacularGet('/recipes/informationBulk', [
     'ids'              => implode(',', $recipeIds),
-    'includeNutrition' => 'false',
+    'includeNutrition' => 'true',
 ]);
 
 $detailedRecipes = [];
@@ -143,11 +143,28 @@ foreach ($results as $recipe) {
         ? round(count($usedIngredients) / $totalIngredients * 100)
         : 0;
 
+    // Estrai dati nutrizionali dalla chiamata bulk
+    $nutrition = null;
+    if (isset($detailed['nutrition']['nutrients'])) {
+        $lookup = [];
+        foreach ($detailed['nutrition']['nutrients'] as $n) {
+            $lookup[$n['name']] = round((float)$n['amount'], 1);
+        }
+        $nutrition = [
+            'calories' => $lookup['Calories']      ?? null,
+            'proteins' => $lookup['Protein']       ?? null,
+            'carbs'    => $lookup['Carbohydrates'] ?? null,
+            'fats'     => $lookup['Fat']           ?? null,
+            'fiber'    => $lookup['Fiber']         ?? null,
+            'sodium'   => $lookup['Sodium']        ?? null,
+            'servings' => $detailed['servings']    ?? null,
+        ];
+    }
+
     $formattedRecipes[] = [
         'id'                      => $recipeId,
         'title'                   => $recipe['title'],
         'image'                   => $recipe['image']  ?? null,
-        'source_url'              => $detailed['sourceUrl'] ?? null,
         'ready_in_minutes'        => $detailed['readyInMinutes'] ?? null,
         'servings'                => $detailed['servings'] ?? null,
         'used_ingredients'        => $usedIngredients,
@@ -156,6 +173,7 @@ foreach ($results as $recipe) {
         'missed_ingredient_count' => count($missedIngredients),
         'compatibility'           => $compatibility,
         'can_make_now'            => count($missedIngredients) === 0,
+        'nutrition'               => $nutrition,
     ];
 }
 
