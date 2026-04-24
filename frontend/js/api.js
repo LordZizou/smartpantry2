@@ -149,7 +149,7 @@ function initContextSwitcher(user) {
         select.id = 'ctx-select';
         select.title = 'Cambia contesto';
         const selectWidth = isMobile ? '90px' : '160px';
-        select.style.cssText = `appearance:none; -webkit-appearance:none; font-size:0.85rem; font-weight:700; padding:0.38rem 1.8rem 0.38rem 0.85rem; border-radius:22px; border:1px solid rgba(255,255,255,0.3); background:rgba(8,42,20,0.82); cursor:pointer; max-width:${selectWidth}; color:#ffffff; outline:none; transition:background 0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.3);`;
+        select.style.cssText = `appearance:none; -webkit-appearance:none; font-size:0.85rem; font-weight:700; padding:0.38rem 1.8rem 0.38rem 0.85rem; border-radius:22px; border:1.5px solid rgba(74,222,128,0.7); background:rgba(22,163,74,0.28); cursor:pointer; max-width:${selectWidth}; color:#ffffff; outline:none; transition:background 0.2s, border-color 0.2s; box-shadow:0 0 0 1px rgba(74,222,128,0.18), 0 2px 8px rgba(0,0,0,0.25);`;
 
         const personalOpt = document.createElement('option');
         personalOpt.value = 'personal';
