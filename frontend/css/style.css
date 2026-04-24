@@ -2127,3 +2127,33 @@ input:checked + .toggle-slider::before {
     to { transform: rotate(360deg); }
 }
 
+/* ---------- Footer sito ---------- */
+.site-footer {
+    text-align: center;
+    padding: 0.9rem 1.5rem;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-light);
+    letter-spacing: 0.01em;
+    flex-shrink: 0;
+}
+.site-footer .footer-sep {
+    margin: 0 0.55rem;
+    opacity: 0.45;
+}
+[data-theme="dark"] .site-footer {
+    color: #484f58;
+    border-top-color: #21262d;
+}
+
+/* Footer nel login (dentro auth-panel) */
+.auth-footer-credit {
+    margin-top: auto;
+    padding-top: 1.5rem;
+    text-align: center;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    letter-spacing: 0.01em;
+}
+[data-theme="dark"] .auth-footer-credit { color: #484f58; }
+
