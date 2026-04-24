@@ -128,6 +128,8 @@ function initContextSwitcher(user) {
     const groups = user.groups || [];
     const ctx    = user.active_context || { type: 'personal', group_id: null };
 
+    const isMobile = window.innerWidth <= 600;
+
     const div = document.createElement('div');
     div.id = 'context-switcher';
     div.style.cssText = 'display:flex; align-items:center; gap:0.4rem; flex-shrink:0; margin-left:auto;';
@@ -138,13 +140,14 @@ function initContextSwitcher(user) {
         a.className = 'btn btn-ghost btn-sm';
         a.style.cssText = 'font-size:0.75rem; white-space:nowrap;';
         a.title = 'Crea o unisciti a un gruppo';
-        a.textContent = '👥 Gruppo';
+        a.textContent = isMobile ? '👥' : '👥 Gruppo';
         div.appendChild(a);
     } else {
         const select = document.createElement('select');
         select.id = 'ctx-select';
         select.title = 'Cambia contesto';
-        select.style.cssText = 'font-size:0.78rem; padding:0.25rem 0.5rem; border-radius:20px; border:1px solid var(--border); background:var(--bg-2); cursor:pointer; max-width:145px; color:var(--text);';
+        const selectWidth = isMobile ? '90px' : '145px';
+        select.style.cssText = `font-size:0.78rem; padding:0.25rem 0.5rem; border-radius:20px; border:1px solid var(--border); background:var(--bg-2); cursor:pointer; max-width:${selectWidth}; color:var(--text);`;
 
         const personalOpt = document.createElement('option');
         personalOpt.value = 'personal';

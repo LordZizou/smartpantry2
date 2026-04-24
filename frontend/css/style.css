@@ -1635,7 +1635,7 @@ input:checked + .toggle-slider::before {
     }
 
     .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(3, 1fr);
     }
 
     .form-row {
@@ -1651,11 +1651,102 @@ input:checked + .toggle-slider::before {
     }
 }
 
-@media (max-width: 480px) {
-    .stats-grid {
-        grid-template-columns: 1fr 1fr;
+@media (max-width: 600px) {
+    /* Topbar compatto */
+    .topbar {
+        padding: 0 0.75rem;
+        gap: 0.5rem;
+        height: 56px;
+    }
+    .page-title {
+        font-size: 1rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 0;
+    }
+    .topbar-end {
+        gap: 0.35rem;
+        flex-shrink: 0;
+    }
+    .theme-toggle-app {
+        width: 34px;
+        height: 34px;
+        font-size: 1rem;
     }
 
+    /* Contenuto pagina */
+    .page-content {
+        padding: 0.85rem;
+    }
+    .page-intro h2 {
+        font-size: 1.35rem;
+    }
+
+    /* Stat cards — 3 colonne compatte */
+    .stats-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+    }
+    .stat-card {
+        padding: 0.85rem 0.65rem;
+        gap: 0.6rem;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .stat-orb {
+        width: 32px;
+        height: 32px;
+    }
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    .stat-label {
+        font-size: 0.72rem;
+    }
+
+    /* Pill-tabs scrollabili */
+    .pill-tabs {
+        width: 100%;
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+        flex-wrap: nowrap;
+    }
+    .pill-tabs::-webkit-scrollbar { display: none; }
+    .pill-tab { white-space: nowrap; }
+
+    /* Card griglia */
+    .card { border-radius: var(--radius); }
+
+    /* Modal full-bottom su mobile */
+    .modal-overlay { align-items: flex-end; }
+    .modal {
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        max-height: 90vh;
+        margin: 0;
+        width: 100%;
+        max-width: 100% !important;
+    }
+    .modal-body { max-height: 75vh; }
+
+    /* Recipe/pantry grid singola colonna */
+    .pantry-grid { grid-template-columns: 1fr; }
+    .recipes-grid { grid-template-columns: 1fr; }
+
+    /* Filtri avvolgibili */
+    .filters { gap: 0.35rem; }
+    .filter-btn { font-size: 0.82rem; padding: 0.4rem 0.7rem; }
+
+    /* Search box full width */
+    .search-box { min-width: 0; }
+
+    /* View toggle compatto */
+    .view-toggle { flex-shrink: 0; }
+    .view-btn { font-size: 0.8rem; padding: 0.4rem 0.6rem; }
+}
+
+@media (max-width: 480px) {
     .topbar-title {
         font-size: 1rem;
     }
