@@ -169,6 +169,26 @@
             padding: 0.65rem 0.9rem;
         }
 
+        /* ---- Crea / Entra: contenuto centrato ---- */
+        #section-create .card-header,
+        #section-join   .card-header {
+            justify-content: center;
+            text-align: center;
+        }
+        #section-create .card-body,
+        #section-join   .card-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        #section-create .form-section,
+        #section-join   .form-section {
+            width: 100%;
+            max-width: 440px;
+            text-align: left;
+        }
+
         /* ---- Empty state ---- */
         .no-groups-state {
             text-align: center;
