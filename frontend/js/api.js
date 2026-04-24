@@ -148,12 +148,13 @@ function initContextSwitcher(user) {
         const select = document.createElement('select');
         select.id = 'ctx-select';
         select.title = 'Cambia contesto';
-        const selectWidth = isMobile ? '80px' : '150px';
-        select.style.cssText = `appearance:none; -webkit-appearance:none; font-size:0.85rem; font-weight:600; padding:0.38rem 1.8rem 0.38rem 0.85rem; border-radius:22px; border:1px solid rgba(255,255,255,0.22); background:rgba(255,255,255,0.12); backdrop-filter:blur(8px); cursor:pointer; max-width:${selectWidth}; color:#ffffff; outline:none; transition:background 0.2s;`;
+        const selectWidth = isMobile ? '90px' : '160px';
+        select.style.cssText = `appearance:none; -webkit-appearance:none; font-size:0.85rem; font-weight:700; padding:0.38rem 1.8rem 0.38rem 0.85rem; border-radius:22px; border:1px solid rgba(255,255,255,0.3); background:rgba(8,42,20,0.82); cursor:pointer; max-width:${selectWidth}; color:#ffffff; outline:none; transition:background 0.2s; box-shadow:0 2px 8px rgba(0,0,0,0.3);`;
 
         const personalOpt = document.createElement('option');
         personalOpt.value = 'personal';
         personalOpt.textContent = '👤 Personale';
+        personalOpt.style.cssText = 'color:#1a1a1a; background:#ffffff;';
         if (ctx.type === 'personal') personalOpt.selected = true;
         select.appendChild(personalOpt);
 
@@ -161,6 +162,7 @@ function initContextSwitcher(user) {
             const opt = document.createElement('option');
             opt.value = `group-${g.id}`;
             opt.textContent = `👥 ${g.name}`;
+            opt.style.cssText = 'color:#1a1a1a; background:#ffffff;';
             if (ctx.type === 'group' && ctx.group_id === g.id) opt.selected = true;
             select.appendChild(opt);
         });

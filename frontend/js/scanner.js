@@ -151,10 +151,12 @@ function switchToNameTab() {
 }
 
 function setScanUiState(state) {
-    const startBtn  = document.getElementById('btn-start-scan');
-    const stopBtn   = document.getElementById('btn-stop-scan');
-    const statusEl  = document.getElementById('scan-status');
-    const loadingEl = document.getElementById('scan-loading');
+    const startBtn     = document.getElementById('btn-start-scan');
+    const stopBtn      = document.getElementById('btn-stop-scan');
+    const statusEl     = document.getElementById('scan-status');
+    const loadingEl    = document.getElementById('scan-loading');
+    const placeholder  = document.getElementById('cam-placeholder');
+    const readerEl     = document.getElementById('reader');
 
     stopBtn?.classList.add('hidden');
     loadingEl?.classList.add('hidden');
@@ -163,15 +165,21 @@ function setScanUiState(state) {
         case 'scanning':
             startBtn?.classList.add('hidden');
             stopBtn?.classList.remove('hidden');
+            if (placeholder) placeholder.style.display = 'none';
+            if (readerEl) readerEl.style.display = 'block';
             if (statusEl) statusEl.textContent = '🎥 Punta la fotocamera sul barcode…';
             break;
         case 'loading':
             startBtn?.classList.add('hidden');
             loadingEl?.classList.remove('hidden');
+            if (placeholder) placeholder.style.display = 'none';
+            if (readerEl) readerEl.style.display = 'none';
             if (statusEl) statusEl.textContent = '🔍 Ricerca prodotto…';
             break;
         default:
             startBtn?.classList.remove('hidden');
+            if (placeholder) placeholder.style.display = 'flex';
+            if (readerEl) readerEl.style.display = 'none';
             if (statusEl) statusEl.textContent = '';
     }
 }
