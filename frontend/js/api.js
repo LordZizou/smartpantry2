@@ -132,22 +132,24 @@ function initContextSwitcher(user) {
 
     const div = document.createElement('div');
     div.id = 'context-switcher';
-    div.style.cssText = 'display:flex; align-items:center; gap:0.4rem; flex-shrink:0; margin-left:auto;';
+    div.style.cssText = 'display:flex; align-items:center; gap:0.5rem; flex-shrink:0; margin-left:auto;';
 
     if (!groups.length) {
         const a = document.createElement('a');
         a.href = 'gruppo.html';
-        a.className = 'btn btn-ghost btn-sm';
-        a.style.cssText = 'font-size:0.75rem; white-space:nowrap;';
         a.title = 'Crea o unisciti a un gruppo';
+        a.style.cssText = 'display:inline-flex; align-items:center; gap:0.35rem; background:rgba(255,255,255,0.12); border:1px solid rgba(255,255,255,0.22); border-radius:22px; padding:0.35rem 0.85rem; color:#fff; font-size:0.82rem; font-weight:600; text-decoration:none; white-space:nowrap; backdrop-filter:blur(8px); transition:background 0.2s;';
         a.textContent = isMobile ? '👥' : '👥 Gruppo';
         div.appendChild(a);
     } else {
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = 'position:relative; display:flex; align-items:center;';
+
         const select = document.createElement('select');
         select.id = 'ctx-select';
         select.title = 'Cambia contesto';
-        const selectWidth = isMobile ? '90px' : '145px';
-        select.style.cssText = `font-size:0.78rem; padding:0.25rem 0.5rem; border-radius:20px; border:1px solid var(--border); background:var(--bg-2); cursor:pointer; max-width:${selectWidth}; color:var(--text);`;
+        const selectWidth = isMobile ? '80px' : '150px';
+        select.style.cssText = `appearance:none; -webkit-appearance:none; font-size:0.85rem; font-weight:600; padding:0.38rem 1.8rem 0.38rem 0.85rem; border-radius:22px; border:1px solid rgba(255,255,255,0.22); background:rgba(255,255,255,0.12); backdrop-filter:blur(8px); cursor:pointer; max-width:${selectWidth}; color:#ffffff; outline:none; transition:background 0.2s;`;
 
         const personalOpt = document.createElement('option');
         personalOpt.value = 'personal';
@@ -183,14 +185,22 @@ function initContextSwitcher(user) {
             }
         });
 
-        div.appendChild(select);
+        const chevron = document.createElement('span');
+        chevron.textContent = '▾';
+        chevron.style.cssText = 'position:absolute; right:0.6rem; top:50%; transform:translateY(-50%); color:rgba(255,255,255,0.75); font-size:0.7rem; pointer-events:none;';
 
-        const a = document.createElement('a');
-        a.href = 'gruppo.html';
-        a.title = 'Gestisci gruppi';
-        a.style.cssText = 'font-size:1rem; text-decoration:none; flex-shrink:0; line-height:1; opacity:0.65;';
-        a.textContent = '⚙';
-        div.appendChild(a);
+        wrapper.appendChild(select);
+        wrapper.appendChild(chevron);
+        div.appendChild(wrapper);
+
+        if (!isMobile) {
+            const a = document.createElement('a');
+            a.href = 'gruppo.html';
+            a.title = 'Gestisci gruppi';
+            a.style.cssText = 'display:flex; align-items:center; justify-content:center; width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.18); color:rgba(255,255,255,0.75); font-size:0.85rem; text-decoration:none; flex-shrink:0; transition:background 0.2s;';
+            a.textContent = '⚙';
+            div.appendChild(a);
+        }
     }
 
     const end = topbar.querySelector('.topbar-end');

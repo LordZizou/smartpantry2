@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function syncThemeIcon() {
     const theme = document.documentElement.getAttribute('data-theme') || 'light';
     const icon  = document.getElementById('theme-icon');
-    if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    if (icon) icon.textContent = theme === 'dark' ? '🍌' : '🥑';
 }
 
 /** Alterna tra chiaro e scuro con animazione sull'icona */
@@ -45,5 +45,5 @@ function applyTheme(theme) {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('sp-theme', theme);
     const icon = document.getElementById('theme-icon');
-    if (icon) icon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    if (icon) icon.textContent = theme === 'dark' ? '🍌' : '🥑';
 }
