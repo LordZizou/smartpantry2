@@ -62,185 +62,185 @@
     --primary-light:  #56d364;
     --primary-bg:     #0f2a1a;
 
-    --green-50:       #0d1f12;
+    --green-50:       #0d1f15;
     --green-100:      #0f2a1a;
     --green-150:      #173d22;
-    --green-900:      #0d1117;
+    --green-900:      #0d1626;
 
     --accent:         #f0883e;
     --warning:        #d29922;
-    --warning-bg:     #1f1b0d;
+    --warning-bg:     #1e1a0c;
     --danger:         #f85149;
-    --danger-bg:      #2d1b1b;
+    --danger-bg:      #2a1a1a;
     --success:        #3fb950;
     --success-bg:     #0f2a1a;
     --info:           #58a6ff;
     --info-bg:        #0d1d3a;
 
-    --text:           #e6edf3;
-    --text-light:     #8b949e;
-    --text-muted:     #6e7681;
-    --border:         #21262d;
-    --border-light:   #161b22;
-    --white:          #161b22;
-    --bg:             #0d1117;
-    --bg-2:           #161b22;
+    --text:           #dce6f0;
+    --text-light:     #8fa3bb;
+    --text-muted:     #6a82a0;
+    --border:         #2d3d58;
+    --border-light:   #1e2e47;
+    --white:          #182438;
+    --bg:             #111c30;
+    --bg-2:           #182438;
 
-    --shadow-sm:      0 1px 4px rgba(0,0,0,0.4);
-    --shadow:         0 4px 16px rgba(0,0,0,0.5), 0 1px 4px rgba(0,0,0,0.3);
-    --shadow-md:      0 8px 28px rgba(0,0,0,0.6), 0 2px 8px rgba(0,0,0,0.3);
-    --shadow-lg:      0 20px 48px rgba(0,0,0,0.7), 0 6px 16px rgba(0,0,0,0.4);
+    --shadow-sm:      0 1px 4px rgba(0,0,0,0.35);
+    --shadow:         0 4px 16px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.25);
+    --shadow-md:      0 8px 28px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.25);
+    --shadow-lg:      0 20px 48px rgba(0,0,0,0.65), 0 6px 16px rgba(0,0,0,0.35);
 }
 
 /* Sfondo body in dark */
 [data-theme="dark"] body {
-    background: linear-gradient(160deg, #0a0f14 0%, #0d1117 40%, #0a0d10 100%);
+    background: linear-gradient(160deg, #0d1626 0%, #111c30 50%, #0f1a2a 100%);
 }
 
-/* Drawer in dark — gradiente leggermente più scuro */
+/* Drawer in dark — gradiente verde scuro */
 [data-theme="dark"] .drawer { background: linear-gradient(180deg, #0a2614 0%, #06180c 60%, #040e07 100%); }
 
 /* Topbar in dark */
 [data-theme="dark"] .topbar {
-    background: rgba(13,17,23,0.92);
-    border-bottom-color: #21262d;
+    background: rgba(10,18,32,0.96);
+    border-bottom-color: #2d3d58;
 }
-[data-theme="dark"] .topbar .page-title { color: #e6edf3; }
-[data-theme="dark"] .hamburger span { background: #c9d1d9; }
-[data-theme="dark"] .hamburger:hover { background: #21262d; }
+[data-theme="dark"] .topbar .page-title { color: #dce6f0; }
+[data-theme="dark"] .hamburger span { background: #c0cfe0; }
+[data-theme="dark"] .hamburger:hover { background: #1a2a42; }
 
 /* Stat cards in dark */
 [data-theme="dark"] .stat-card {
-    background: rgba(22,27,34,0.9);
-    border-color: #21262d;
+    background: rgba(24,36,56,0.92);
+    border-color: #2d3d58;
 }
-[data-theme="dark"] .stat-card:hover { background: rgba(33,38,45,0.95); }
-[data-theme="dark"] .stat-value { color: #e6edf3; }
-[data-theme="dark"] .stat-label { color: #8b949e; }
+[data-theme="dark"] .stat-card:hover { background: rgba(30,46,68,0.96); }
+[data-theme="dark"] .stat-value { color: #dce6f0; }
+[data-theme="dark"] .stat-label { color: #8fa3bb; }
 
 /* Card generica in dark */
 [data-theme="dark"] .card {
-    background: rgba(22,27,34,0.95);
-    border-color: #21262d;
+    background: rgba(24,36,56,0.96);
+    border-color: #2d3d58;
 }
-[data-theme="dark"] .card:hover { background: rgba(33,38,45,0.98); }
+[data-theme="dark"] .card:hover { background: rgba(30,46,68,0.99); }
 [data-theme="dark"] .card-header {
-    border-bottom-color: #21262d;
-    background: linear-gradient(135deg, rgba(15,42,26,0.4), transparent);
+    border-bottom-color: #2d3d58;
+    background: linear-gradient(135deg, rgba(15,42,26,0.35), transparent);
 }
-[data-theme="dark"] .card-title  { color: #e6edf3; }
+[data-theme="dark"] .card-title  { color: #dce6f0; }
 
 /* Pill-tabs in dark */
-[data-theme="dark"] .pill-tabs { background: #161b22; border-color: #30363d; }
+[data-theme="dark"] .pill-tabs { background: #182438; border-color: #2d3d58; }
 
 /* Form controls in dark */
 [data-theme="dark"] .form-control {
-    background: #0d1117;
-    border-color: #30363d;
-    color: #e6edf3;
+    background: #0d1626;
+    border-color: #2d3d58;
+    color: #dce6f0;
 }
 [data-theme="dark"] .form-control:focus {
     border-color: #3fb950;
     box-shadow: 0 0 0 3px rgba(63,185,80,0.12);
 }
-[data-theme="dark"] .form-control::placeholder { color: #484f58; }
-[data-theme="dark"] .form-label { color: #c9d1d9; }
-[data-theme="dark"] .form-hint  { color: #6e7681; }
+[data-theme="dark"] .form-control::placeholder { color: #4a5a78; }
+[data-theme="dark"] .form-label { color: #c0cfe0; }
+[data-theme="dark"] .form-hint  { color: #6a82a0; }
 
 /* Select e option in dark */
-[data-theme="dark"] select.form-control option { background: #161b22; }
+[data-theme="dark"] select.form-control option { background: #182438; }
 
 /* Bottoni in dark */
 [data-theme="dark"] .btn-secondary {
-    background: #21262d;
-    border-color: #30363d;
-    color: #c9d1d9;
+    background: #1a2a42;
+    border-color: #2d3d58;
+    color: #c0cfe0;
 }
-[data-theme="dark"] .btn-secondary:hover { background: #30363d; color: #e6edf3; }
+[data-theme="dark"] .btn-secondary:hover { background: #243450; color: #dce6f0; }
 [data-theme="dark"] .btn-outline { border-color: #3fb950; color: #3fb950; }
-[data-theme="dark"] .btn-outline:hover { background: #3fb950; color: #0d1117; }
+[data-theme="dark"] .btn-outline:hover { background: #3fb950; color: #0d1626; }
 [data-theme="dark"] .btn-ghost {
-    background: rgba(255,255,255,0.06);
-    border-color: rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.10);
 }
-[data-theme="dark"] .btn-ghost:hover { background: rgba(255,255,255,0.12); }
+[data-theme="dark"] .btn-ghost:hover { background: rgba(255,255,255,0.10); }
 
 /* Alert in dark */
 [data-theme="dark"] .alert-success { background: #0f2a1a; color: #3fb950; border-color: #238636; }
-[data-theme="dark"] .alert-warning { background: #1f1b0d; color: #d29922; border-color: #9e6a03; }
-[data-theme="dark"] .alert-danger  { background: #2d1b1b; color: #f85149; border-color: #6e3232; }
+[data-theme="dark"] .alert-warning { background: #1e1a0c; color: #d29922; border-color: #9e6a03; }
+[data-theme="dark"] .alert-danger  { background: #2a1a1a; color: #f85149; border-color: #6e3232; }
 [data-theme="dark"] .alert-info    { background: #0d1d3a; color: #58a6ff; border-color: #1f4785; }
 
 /* Badge in dark */
 [data-theme="dark"] .badge-ok      { background: #0f2a1a; color: #3fb950; }
-[data-theme="dark"] .badge-expiring{ background: #1f1b0d; color: #d29922; }
-[data-theme="dark"] .badge-expired { background: #2d1b1b; color: #f85149; }
+[data-theme="dark"] .badge-expiring{ background: #1e1a0c; color: #d29922; }
+[data-theme="dark"] .badge-expired { background: #2a1a1a; color: #f85149; }
 [data-theme="dark"] .badge-green   { background: #0f2a1a; color: #3fb950; }
 
 /* Modal in dark */
 [data-theme="dark"] .modal {
-    background: #161b22;
-    border: 1px solid #30363d;
+    background: #182438;
+    border: 1px solid #2d3d58;
 }
-[data-theme="dark"] .modal-header { border-bottom-color: #21262d; }
-[data-theme="dark"] .modal-title  { color: #e6edf3; }
-[data-theme="dark"] .modal-close  { color: #8b949e; }
-[data-theme="dark"] .modal-close:hover { background: #21262d; color: #e6edf3; }
+[data-theme="dark"] .modal-header { border-bottom-color: #2d3d58; }
+[data-theme="dark"] .modal-title  { color: #dce6f0; }
+[data-theme="dark"] .modal-close  { color: #8fa3bb; }
+[data-theme="dark"] .modal-close:hover { background: #1a2a42; color: #dce6f0; }
 
 /* Filtri / pill-tabs in dark */
 [data-theme="dark"] .filter-btn {
-    background: #161b22;
-    border-color: #30363d;
-    color: #8b949e;
+    background: #182438;
+    border-color: #2d3d58;
+    color: #8fa3bb;
 }
 [data-theme="dark"] .filter-btn:hover  { border-color: #3fb950; color: #3fb950; }
 [data-theme="dark"] .filter-btn.active { background: #0f2a1a; border-color: #3fb950; color: #3fb950; }
-[data-theme="dark"] .pill-tab { color: #8b949e; }
-[data-theme="dark"] .pill-tab.active { background: #3fb950; color: #0d1117; }
+[data-theme="dark"] .pill-tab { color: #8fa3bb; }
+[data-theme="dark"] .pill-tab.active { background: #3fb950; color: #0d1626; }
 
 /* Ingredient tag in dark */
-[data-theme="dark"] .ingredient-tag         { background: #161b22; border-color: #30363d; color: #c9d1d9; }
+[data-theme="dark"] .ingredient-tag         { background: #182438; border-color: #2d3d58; color: #c0cfe0; }
 [data-theme="dark"] .ingredient-tag.available{ background: #0f2a1a; border-color: #238636; color: #3fb950; }
-[data-theme="dark"] .ingredient-tag.missing  { background: #2d1b1b; border-color: #6e3232; color: #f85149; }
+[data-theme="dark"] .ingredient-tag.missing  { background: #2a1a1a; border-color: #6e3232; color: #f85149; }
 
 /* Recipe card in dark */
 [data-theme="dark"] .recipe-card {
-    background: #161b22;
-    border-color: #21262d;
+    background: #182438;
+    border-color: #2d3d58;
 }
-[data-theme="dark"] .recipe-title  { color: #e6edf3; }
-[data-theme="dark"] .recipe-footer { border-top-color: #21262d; }
-[data-theme="dark"] .recipe-image-placeholder { background: #21262d; }
+[data-theme="dark"] .recipe-title  { color: #dce6f0; }
+[data-theme="dark"] .recipe-footer { border-top-color: #2d3d58; }
+[data-theme="dark"] .recipe-image-placeholder { background: #1a2a42; }
 
 /* Pantry grid cards in dark */
 [data-theme="dark"] .product-card {
-    background: rgba(22,27,34,0.95);
-    border-color: #21262d;
+    background: rgba(24,36,56,0.96);
+    border-color: #2d3d58;
 }
-[data-theme="dark"] .product-card:hover { background: rgba(33,38,45,0.98); }
-[data-theme="dark"] .product-name  { color: #e6edf3; }
-[data-theme="dark"] .product-brand { color: #8b949e; }
+[data-theme="dark"] .product-card:hover { background: rgba(30,46,68,0.99); }
+[data-theme="dark"] .product-name  { color: #dce6f0; }
+[data-theme="dark"] .product-brand { color: #8fa3bb; }
 [data-theme="dark"] .product-image-placeholder { background: linear-gradient(135deg, #0f2a1a, #0d1d3a); }
 
 /* Empty state in dark */
-[data-theme="dark"] .empty-state { color: #8b949e; }
+[data-theme="dark"] .empty-state { color: #8fa3bb; }
 
 /* Toast in dark */
-[data-theme="dark"] .toast { background: #21262d; border-color: #30363d; color: #e6edf3; }
+[data-theme="dark"] .toast { background: #1a2a42; border-color: #2d3d58; color: #dce6f0; }
 
 /* Nutrition panel in dark */
-[data-theme="dark"] .nutrition-panel { background: #0d1117; border-color: #21262d; }
-[data-theme="dark"] .nutrition-panel-title { color: #c9d1d9; }
-[data-theme="dark"] .nutrient-name { color: #8b949e; }
-[data-theme="dark"] .nutrient-bar-wrap { background: #21262d; }
+[data-theme="dark"] .nutrition-panel { background: #0d1626; border-color: #2d3d58; }
+[data-theme="dark"] .nutrition-panel-title { color: #c0cfe0; }
+[data-theme="dark"] .nutrient-name { color: #8fa3bb; }
+[data-theme="dark"] .nutrient-bar-wrap { background: #2d3d58; }
 
 /* View toggle in dark */
-[data-theme="dark"] .view-toggle { background: #161b22; border-color: #30363d; }
-[data-theme="dark"] .view-btn { color: #8b949e; }
+[data-theme="dark"] .view-toggle { background: #182438; border-color: #2d3d58; }
+[data-theme="dark"] .view-btn { color: #8fa3bb; }
 [data-theme="dark"] .view-btn.active { background: #0f2a1a; color: #3fb950; }
 
 /* Search box in dark */
-[data-theme="dark"] .search-box input { background: #0d1117; }
+[data-theme="dark"] .search-box input { background: #0d1626; }
 
 /* Ing detail popup in dark */
 [data-theme="dark"] .ing-detail-item.available { background: rgba(63,185,80,0.08); }
@@ -2209,8 +2209,8 @@ input:checked + .toggle-slider::before {
     opacity: 0.45;
 }
 [data-theme="dark"] .site-footer {
-    color: #484f58;
-    border-top-color: #21262d;
+    color: #4a5a78;
+    border-top-color: #2d3d58;
 }
 
 /* Footer nel login (dentro auth-panel) */
