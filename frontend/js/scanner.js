@@ -414,9 +414,15 @@ async function handleScanAdd(e) {
         if (res.success) {
             showToast('Prodotto aggiunto alla dispensa!', 'success');
             resetResult();
-            // Torna alla ricerca per eventuale aggiunta multipla
+            // Torna allo stato iniziale: tab barcode, campi e risultati puliti
             document.getElementById('manual-barcode').value    = '';
             document.getElementById('name-search-input').value = '';
+            const nameResults = document.getElementById('name-search-results');
+            if (nameResults) { nameResults.innerHTML = ''; nameResults.classList.add('hidden'); }
+            document.querySelectorAll('.scanner-tab').forEach(b =>
+                b.classList.toggle('active', b.dataset.tab === 'barcode'));
+            document.getElementById('section-barcode').classList.remove('hidden');
+            document.getElementById('section-name').classList.add('hidden');
         } else {
             showToast(res.message || 'Errore', 'error');
             if (btn) { btn.disabled = false; btn.textContent = '✓ Aggiungi alla dispensa'; }
