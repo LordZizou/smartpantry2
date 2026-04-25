@@ -47,7 +47,7 @@
         <h1 class="page-title">Dispensa</h1>
         <div class="topbar-end">
             <button class="theme-toggle-app" id="theme-toggle" title="Tema"><span id="theme-icon">🥑</span></button>
-            <button class="btn btn-primary btn-sm" onclick="openAddModal()">+ Aggiungi</button>
+            <a href="scanner.html" class="btn btn-primary btn-sm">+ Aggiungi</a>
         </div>
     </header>
 
@@ -125,127 +125,6 @@
         <span class="footer-sep">—</span>
         Realizzato da Morsli &amp; Katia
     </footer>
-</div>
-
-<!-- ===== MODAL: Aggiungi prodotto (wizard 2 step) ===== -->
-<div class="modal-overlay" id="modal-add">
-    <div class="modal" style="max-width:560px;">
-        <div class="modal-header">
-            <span id="modal-add-icon">🔍</span>
-            <span class="modal-title" id="modal-add-title">Cerca prodotto</span>
-            <button class="modal-close" onclick="closeAddModal()">×</button>
-        </div>
-        <div class="modal-body">
-
-            <!-- Step indicator -->
-            <div class="step-indicator">
-                <div class="step-dot active" id="step-dot-1">1</div>
-                <div class="step-line" id="step-line-1"></div>
-                <div class="step-dot" id="step-dot-2">2</div>
-            </div>
-
-            <!-- ===== STEP 1: Cerca prodotto ===== -->
-            <div id="step-search">
-                <!-- Ricerca per nome -->
-                <div class="form-group">
-                    <label class="form-label">Cerca per nome (OpenFoodFacts)</label>
-                    <div style="display:flex; gap:0.5rem;">
-                        <input class="form-control" type="text" id="of-search-input"
-                               placeholder="es. Latte Granarolo, Pasta Barilla…" autocomplete="off">
-                        <button class="btn btn-primary" id="btn-of-search">Cerca</button>
-                    </div>
-                </div>
-
-                <!-- Loader -->
-                <div id="of-search-loader" class="loading hidden" style="padding:1.5rem;">
-                    <div class="spinner"></div>
-                    <span>Ricerca su OpenFoodFacts…</span>
-                </div>
-
-                <!-- Risultati ricerca -->
-                <div id="of-search-results" class="product-search-results hidden"></div>
-
-                <!-- Opzione inserimento manuale (con categoria obbligatoria) -->
-                <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border-light);">
-                    <p style="font-size:0.85rem; color:var(--text-light); margin-bottom:0.6rem;">
-                        Prodotto non trovato su OpenFoodFacts?
-                    </p>
-                    <button class="btn btn-secondary btn-sm" id="btn-manual-fallback">
-                        Inserisci manualmente
-                    </button>
-                </div>
-            </div>
-
-            <!-- ===== STEP 2: Dettagli prodotto ===== -->
-            <div id="step-details" class="hidden">
-                <!-- Anteprima prodotto selezionato -->
-                <div class="selected-product-preview" id="selected-preview"></div>
-
-                <!-- Form dettagli -->
-                <form id="form-add">
-                    <!-- Campi nascosti (dati dal prodotto trovato) -->
-                    <input type="hidden" id="add-name">
-                    <input type="hidden" id="add-brand">
-                    <input type="hidden" id="add-barcode">
-
-                    <!-- Categoria (obbligatoria) -->
-                    <div class="form-group">
-                        <label class="form-label" for="add-category">Categoria *</label>
-                        <select class="form-control" id="add-category" required>
-                            <option value="">— seleziona categoria —</option>
-                        </select>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label class="form-label" for="add-quantity">Quantità *</label>
-                            <input class="form-control" type="number" id="add-quantity" value="1" min="0.1" step="0.1" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label" for="add-unit">Unità *</label>
-                            <select class="form-control" id="add-unit">
-                                <option value="pz">pezzi</option>
-                                <option value="g">grammi (g)</option>
-                                <option value="kg">kg</option>
-                                <option value="ml">ml</option>
-                                <option value="l">litri (l)</option>
-                                <option value="conf">confezioni</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="add-expiry">Data scadenza</label>
-                        <input class="form-control" type="date" id="add-expiry">
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="add-location">Posizione</label>
-                        <select class="form-control" id="add-location">
-                            <option value="">— seleziona —</option>
-                            <option value="dispensa">Dispensa</option>
-                            <option value="frigo">Frigo</option>
-                            <option value="freezer">Freezer</option>
-                            <option value="cantina">Cantina</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" for="add-notes">Note</label>
-                        <textarea class="form-control" id="add-notes" rows="2" placeholder="Note opzionali…"></textarea>
-                    </div>
-
-                    <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
-                        <button type="button" class="btn btn-secondary" id="btn-back-to-search">Indietro</button>
-                        <button type="submit" class="btn btn-primary" style="flex:1;" id="btn-add-submit">
-                            Aggiungi alla dispensa
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-        </div>
-    </div>
 </div>
 
 <!-- ===== MODAL: Modifica prodotto ===== -->
