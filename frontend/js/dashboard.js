@@ -65,7 +65,7 @@ function renderIngredients(items) {
             <div class="empty-state" style="padding: 1rem 0;">
                 <div class="empty-icon" style="font-size: 2rem;">📦</div>
                 <p>La dispensa è vuota.</p>
-                <a href="pantry.html" class="btn btn-primary btn-sm" style="margin-top:0.5rem;">Aggiungi prodotti</a>
+                <a href="scanner.html" class="btn btn-primary btn-sm" style="margin-top:0.5rem;">Aggiungi prodotti</a>
             </div>`;
         return;
     }
