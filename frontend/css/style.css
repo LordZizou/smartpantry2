@@ -614,27 +614,29 @@ input, select, textarea {
 }
 
 .page-title {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    flex: 1;
+    text-align: center;
     font-size: 1.4rem;
     font-weight: 800;
     color: #ffffff !important;
     white-space: nowrap;
-    pointer-events: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
     letter-spacing: -0.02em;
+    padding: 0 0.5rem;
 }
 
 .topbar-title {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    flex: 1;
+    text-align: center;
     font-size: 1.4rem;
     font-weight: 800;
     color: #ffffff !important;
     white-space: nowrap;
-    pointer-events: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
     letter-spacing: -0.02em;
+    padding: 0 0.5rem;
 }
 
 .hamburger span {
@@ -1723,23 +1725,25 @@ input:checked + .toggle-slider::before {
     /* Topbar compatto */
     .topbar {
         padding: 0 0.75rem;
-        gap: 0.5rem;
+        gap: 0.25rem;
         height: 56px;
     }
     .page-title {
-        font-size: 0.95rem;
-        max-width: 40vw;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-size: 1rem;
+        padding: 0 0.15rem;
     }
     .topbar-end {
-        gap: 0.35rem;
+        gap: 0.25rem;
         flex-shrink: 0;
     }
     .theme-toggle-app {
-        width: 34px;
-        height: 34px;
-        font-size: 1rem;
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+    .topbar-end .btn-sm {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.75rem;
     }
 
     /* Contenuto pagina */
