@@ -1,40 +1,47 @@
 <?php
-// Middleware di autenticazione — verifica che l'utente sia loggato
-// Includere in tutti gli endpoint che richiedono autenticazione
+/**
+ * IL "CONTROLLORE" DEGLI ACCESSI (auth_check.php)
+ * 
+ * Questo file è come un buttafuori all'ingresso di un locale. 
+ * Controlla se chi sta provando a vedere i dati ha il "permesso" (ovvero se ha fatto il login).
+ */
 
 require_once __DIR__ . '/../config.php';
 
 /**
- * Avvia la sessione se non già avviata e controlla l'autenticazione.
- * Se l'utente non è loggato risponde 401 e termina l'esecuzione.
+ * Questa funzione è fondamentale: dice al server "fermati!" se l'utente non è loggato.
+ * Viene messa all'inizio di quasi tutte le pagine del server.
  */
 function requireAuth(): void {
+    // Apriamo il "registro delle sessioni" per vedere chi è collegato
     if (session_status() === PHP_SESSION_NONE) {
         session_name(SESSION_NAME);
         session_start();
     }
 
+    // Se nel registro non c'è scritto l'ID dell'utente, allora non è loggato
     if (empty($_SESSION['user_id'])) {
+        // Rispondiamo con il codice 401 (che significa "Chi sei? Non ti conosco")
         http_response_code(401);
         echo json_encode([
             'success' => false,
-            'message' => 'Non autenticato. Effettua il login.'
+            'message' => 'Accesso negato. Devi prima fare il login per vedere questi dati.'
         ]);
+        // Interrompiamo immediatamente l'esecuzione del codice
         exit;
     }
 }
 
 /**
- * Restituisce l'ID dell'utente corrente dalla sessione.
- * Presuppone che requireAuth() sia già stato chiamato.
+ * Restituisce il numero identificativo (ID) dell'utente che sta usando il sito in questo momento.
  */
 function getCurrentUserId(): int {
     return (int) $_SESSION['user_id'];
 }
 
 /**
- * Avvia la sessione senza richiedere autenticazione.
- * Usato negli endpoint di login/register.
+ * Semplice funzione per iniziare a "ricordare" l'utente. 
+ * Si usa quando qualcuno sta creando un nuovo account o sta entrando per la prima volta.
  */
 function startSession(): void {
     if (session_status() === PHP_SESSION_NONE) {

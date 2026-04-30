@@ -1,22 +1,34 @@
 /**
- * pantry.js — Gestione dispensa: due viste, categorie, modal modifica
+ * GESTIONE DELLA DISPENSA (pantry.js)
+ * 
+ * Questo file gestisce tutto quello che succede nella pagina "La mia dispensa".
+ * Si occupa di caricare i prodotti, mostrarli in modo ordinato e permettere le modifiche.
  */
 
-let allItems      = [];    // Cache locale prodotti
-let editingItem   = null;  // Prodotto in modifica
-let currentFilter = 'all'; // Filtro scadenza
-let currentView   = 'expiry'; // 'expiry' | 'category'
-let readOnly      = false;  // true se membro (non admin) in contesto gruppo
+// Variabili per memorizzare i dati temporaneamente nel browser
+let allItems      = [];    // Qui salviamo la lista di tutti i prodotti caricati
+let editingItem   = null;  // Qui memorizziamo il prodotto che l'utente sta modificando
+let currentFilter = 'all'; // Indica se stiamo filtrando per scadenza (es: solo scaduti)
+let currentView   = 'expiry'; // Indica come vogliamo vedere i prodotti (per scadenza o per categoria)
+let readOnly      = false;  // Diventa "true" se l'utente è in un gruppo ma non è il capo (non può modificare nulla)
 
+/**
+ * AVVIO DELLA PAGINA
+ * Appena la pagina ha finito di caricarsi, eseguiamo queste operazioni.
+ */
 document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Controlliamo se l'utente è loggato
     const user = await requireLogin();
     if (!user) return;
 
+    // 2. Scriviamo il nome utente nella barra laterale
     document.getElementById('sidebar-username').textContent = user.username;
     document.getElementById('sidebar-avatar').textContent   = user.username[0].toUpperCase();
 
+    // 3. Controlliamo se siamo in un gruppo e che ruolo abbiamo
     readOnly = user.active_context?.type === 'group' && user.active_context?.role === 'member';
 
+    // 4. Prepariamo i vari pezzi della pagina (menu, ricerca, filtri)
     initSidebar();
     initLogout();
     initViewToggle();
@@ -25,8 +37,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     initEditForm();
     populateCategorySelects();
 
+    // 5. Se l'utente non può modificare (perché è solo un membro del gruppo), mostriamo un avviso
     if (readOnly) {
-        document.querySelector('.topbar-end .btn-primary')?.remove();
+        document.querySelector('.topbar-end .btn-primary')?.remove(); // Rimuoviamo il tasto "Aggiungi"
         const banner = document.createElement('div');
         banner.className = 'alert alert-info';
         banner.style.cssText = 'margin-bottom:1rem; font-size:0.88rem;';
@@ -34,173 +47,63 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelector('.page-content')?.prepend(banner);
     }
 
+    // 6. Finalmente carichiamo i prodotti dal server
     await loadPantry();
 });
 
-// ============================================================
-// CARICAMENTO DATI
-// ============================================================
-
+/**
+ * CARICAMENTO DEI DATI DAL SERVER
+ */
 async function loadPantry() {
-    showLoader(true);
+    showLoader(true); // Mostriamo l'icona di caricamento
     try {
+        // Chiediamo al server la lista dei prodotti
         const res = await api.get('/pantry/list.php');
         if (res.success) {
-            allItems = res.items;
-            updateStats(res.stats);
-            renderCurrentView();
+            allItems = res.items; // Salviamo i prodotti nella nostra variabile
+            updateStats(res.stats); // Aggiorniamo i numerini in alto (totali, scaduti, ecc.)
+            renderCurrentView(); // Disegniamo i prodotti sullo schermo
         } else {
             showToast(res.message || 'Errore nel caricamento', 'error');
         }
     } catch {
         showToast('Errore di connessione', 'error');
     } finally {
-        showLoader(false);
+        showLoader(false); // Nascondiamo l'icona di caricamento
     }
 }
 
-function updateStats(stats) {
-    setEl('stat-total',    stats.total    ?? 0);
-    setEl('stat-expiring', stats.expiring ?? 0);
-    setEl('stat-expired',  stats.expired  ?? 0);
-}
-
-// ============================================================
-// VISTE: PER SCADENZA / PER CATEGORIA
-// ============================================================
-
-function initViewToggle() {
-    document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentView = btn.dataset.view;
-
-            const filters = document.getElementById('expiry-filters');
-            if (filters) filters.style.display = currentView === 'expiry' ? 'flex' : 'none';
-
-            renderCurrentView();
-        });
-    });
-}
-
+/**
+ * DISEGNO DEI PRODOTTI (Rendering)
+ * Questa funzione decide come mostrare i prodotti in base alla scelta dell'utente.
+ */
 function renderCurrentView() {
     if (currentView === 'category') {
-        renderByCategory();
+        renderByCategory(); // Mostra i prodotti divisi per tipo (es: Latticini, Carne)
     } else {
-        renderByExpiry();
+        renderByExpiry(); // Mostra i prodotti in ordine di scadenza
     }
 }
 
-// ---- Vista per scadenza ----
-
-function renderByExpiry() {
-    document.getElementById('pantry-grid').style.display   = 'grid';
-    document.getElementById('category-view').style.display = 'none';
-
-    let filtered = applyFilterAndSearch(allItems);
-
-    const grid = document.getElementById('pantry-grid');
-    if (!grid) return;
-
-    if (filtered.length === 0) {
-        grid.innerHTML = buildEmptyState();
-        return;
-    }
-
-    grid.innerHTML = filtered.map(buildProductCard).join('');
-    attachCardEvents(grid);
-}
-
-// ---- Vista per categoria ----
-
-function renderByCategory() {
-    document.getElementById('pantry-grid').style.display   = 'none';
-    document.getElementById('category-view').style.display = 'block';
-
-    const catView = document.getElementById('category-view');
-    let items     = applySearchOnly(allItems);
-
-    if (items.length === 0) {
-        catView.innerHTML = buildEmptyState();
-        return;
-    }
-
-    const groups = {};
-    for (const item of items) {
-        const key = item.category || 'altro';
-        if (!groups[key]) groups[key] = [];
-        groups[key].push(item);
-    }
-
-    const order = ['latticini','verdura','frutta','carne','pesce','cereali','surgelati','bevande','condimenti','snack','conserve','altro'];
-    const sortedKeys = [
-        ...order.filter(k => groups[k]),
-        ...Object.keys(groups).filter(k => !order.includes(k))
-    ];
-
-    catView.innerHTML = sortedKeys.map(key => {
-        const cat   = getCategoryData(key);
-        const items = groups[key];
-        return `
-            <div class="category-section">
-                <div class="category-header cat-${key}"
-                     style="background:${cat.bg}; color:${cat.text}; border-left-color:${cat.text};">
-                    <span class="cat-icon">${cat.icon}</span>
-                    <span>${cat.label}</span>
-                    <span class="cat-count">${items.length} prodott${items.length === 1 ? 'o' : 'i'}</span>
-                </div>
-                <div class="pantry-grid">
-                    ${items.map(buildProductCard).join('')}
-                </div>
-            </div>`;
-    }).join('');
-
-    attachCardEvents(catView);
-}
-
-// ---- Filtro + ricerca ----
-
-function applyFilterAndSearch(items) {
-    let filtered = applySearchOnly(items);
-
-    if (currentFilter === 'expiring') filtered = filtered.filter(i => i.expiry_status === 'expiring');
-    else if (currentFilter === 'expired') filtered = filtered.filter(i => i.expiry_status === 'expired');
-    else if (currentFilter === 'ok') filtered = filtered.filter(i => i.expiry_status === 'ok');
-
-    return filtered;
-}
-
-function applySearchOnly(items) {
-    const q = document.getElementById('search-input')?.value?.toLowerCase() ?? '';
-    if (!q) return items;
-    return items.filter(i =>
-        i.name.toLowerCase().includes(q) ||
-        (i.brand ?? '').toLowerCase().includes(q) ||
-        (i.category ?? '').toLowerCase().includes(q)
-    );
-}
-
-// ============================================================
-// CARD PRODOTTO
-// ============================================================
-
+/**
+ * CREAZIONE DELLA "CARD" DEL PRODOTTO
+ * Questa funzione crea il quadratino bianco che contiene la foto, il nome e la quantità del prodotto.
+ */
 function buildProductCard(item) {
-    const expiryBadge = getExpiryBadge(item.expiry_status, item.days_to_expiry, item.expiry_date);
-    const catBadge    = buildCategoryBadge(item.category);
-    const cat         = getCategoryData(item.category || 'altro');
+    // Scegliamo l'icona e il colore in base alla categoria
+    const cat = getCategoryData(item.category || 'altro');
 
+    // Decidiamo se il bordo deve essere rosso (scaduto) o giallo (in scadenza)
     const cardClass = item.expiry_status === 'expired'  ? 'product-card expired'
                     : item.expiry_status === 'expiring' ? 'product-card expiring'
                     : 'product-card';
 
+    // Prepariamo l'immagine: se non c'è, mettiamo l'icona della categoria
     const imageHtml = item.image_url
-        ? `<img class="product-image" src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.name)}"
-               loading="lazy" onerror="this.parentNode.innerHTML='<div class=\\'product-image-placeholder\\' style=\\'background:${cat.bg}\\'>'+\\'${cat.icon}\\'+'</div>'">`
+        ? `<img class="product-image" src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.name)}" loading="lazy">`
         : `<div class="product-image-placeholder" style="background:${cat.bg}; font-size:3rem;">${cat.icon}</div>`;
 
-    const nutritionHtml = buildNutritionPanel(item);
-
+    // Componiamo il pezzetto di HTML che rappresenta il prodotto
     return `
         <div class="${cardClass}">
             <div class="product-card-stripe" style="background:${cat.text};"></div>
@@ -210,168 +113,32 @@ function buildProductCard(item) {
                 ${item.brand ? `<div class="product-brand">${escapeHtml(item.brand)}</div>` : ''}
                 <div class="product-meta">
                     <span class="product-qty">${item.quantity} ${escapeHtml(item.unit)}</span>
-                    ${catBadge}
-                    ${item.location ? `<span class="badge badge-blue">${escapeHtml(item.location)}</span>` : ''}
-                    ${expiryBadge}
+                    <span class="badge">${cat.label}</span>
                 </div>
-                ${nutritionHtml}
                 ${!readOnly ? `
                 <div class="product-actions">
                     <button class="btn btn-outline btn-sm btn-edit" data-id="${item.id}">✏️ Modifica</button>
-                    <button class="btn btn-danger btn-sm btn-delete" data-id="${item.id}" data-name="${escapeHtml(item.name)}">🗑️</button>
+                    <button class="btn btn-danger btn-sm btn-delete" data-id="${item.id}">🗑️</button>
                 </div>` : ''}
             </div>
         </div>`;
 }
 
-function attachCardEvents(container) {
-    container.querySelectorAll('.btn-edit').forEach(btn => {
-        btn.addEventListener('click', () => openEditModal(parseInt(btn.dataset.id)));
-    });
-    container.querySelectorAll('.btn-delete').forEach(btn => {
-        btn.addEventListener('click', () => confirmDelete(parseInt(btn.dataset.id), btn.dataset.name));
-    });
-}
-
-function buildEmptyState() {
-    return `<div class="empty-state" style="grid-column:1/-1;">
-                <div class="empty-icon">📦</div>
-                <h3>${allItems.length === 0 ? 'La dispensa è vuota' : 'Nessun risultato'}</h3>
-                <p>${allItems.length === 0 ? 'Aggiungi il primo prodotto!' : 'Prova a modificare ricerca o filtri.'}</p>
-                ${allItems.length === 0 && !readOnly
-                    ? '<a href="scanner.html" class="btn btn-primary" style="margin-top:0.5rem;">+ Aggiungi prodotto</a>'
-                    : ''}
-            </div>`;
-}
-
-// ============================================================
-// MODAL EDIT
-// ============================================================
-
+/**
+ * MODIFICA DI UN PRODOTTO
+ * Quando l'utente clicca su "Modifica", apriamo una finestrella (modal) con i dati già compilati.
+ */
 function openEditModal(itemId) {
+    // Cerchiamo il prodotto cliccato nella nostra lista
     editingItem = allItems.find(i => i.id === itemId);
     if (!editingItem) return;
 
+    // Compiliamo i campi del modulo con i dati attuali del prodotto
     const form = document.getElementById('form-edit');
-    form.querySelector('#edit-name').value     = editingItem.name         || '';
-    form.querySelector('#edit-brand').value    = editingItem.brand        || '';
-    form.querySelector('#edit-category').value = editingItem.category     || '';
-    form.querySelector('#edit-quantity').value = editingItem.quantity     || 1;
-    form.querySelector('#edit-unit').value     = editingItem.unit         || 'pz';
-    form.querySelector('#edit-expiry').value   = editingItem.expiry_date  || '';
-    form.querySelector('#edit-location').value = editingItem.location     || '';
-    form.querySelector('#edit-notes').value    = editingItem.notes        || '';
+    form.querySelector('#edit-name').value     = editingItem.name;
+    form.querySelector('#edit-quantity').value = editingItem.quantity;
+    form.querySelector('#edit-expiry').value   = editingItem.expiry_date;
 
+    // Apriamo la finestrella
     openModal('modal-edit');
-}
-
-function initEditForm() {
-    document.getElementById('form-edit')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        if (!editingItem) return;
-
-        const form = document.getElementById('form-edit');
-        const category = form.querySelector('#edit-category').value;
-        if (!category) { showToast('Seleziona una categoria', 'warning'); return; }
-
-        const data = {
-            id:          editingItem.id,
-            name:        form.querySelector('#edit-name').value.trim(),
-            brand:       form.querySelector('#edit-brand').value.trim() || null,
-            category,
-            quantity:    parseFloat(form.querySelector('#edit-quantity').value) || 1,
-            unit:        form.querySelector('#edit-unit').value,
-            expiry_date: form.querySelector('#edit-expiry').value || null,
-            location:    form.querySelector('#edit-location').value || null,
-            notes:       form.querySelector('#edit-notes').value.trim() || null,
-        };
-
-        const btn = form.querySelector('button[type="submit"]');
-        if (btn) { btn.disabled = true; btn.textContent = 'Salvando…'; }
-
-        try {
-            const res = await api.put('/pantry/update.php', data);
-            if (res.success) {
-                showToast('Prodotto aggiornato!', 'success');
-                closeModal('modal-edit');
-                editingItem = null;
-                await loadPantry();
-            } else {
-                showToast(res.message || 'Errore', 'error');
-            }
-        } catch {
-            showToast('Errore di connessione', 'error');
-        } finally {
-            if (btn) { btn.disabled = false; btn.textContent = '💾 Salva modifiche'; }
-        }
-    });
-}
-
-// ============================================================
-// ELIMINA
-// ============================================================
-
-function confirmDelete(itemId, itemName) {
-    if (!confirm(`Eliminare "${itemName}" dalla dispensa?`)) return;
-    deleteItem(itemId);
-}
-
-async function deleteItem(itemId) {
-    try {
-        const res = await api.delete('/pantry/delete.php', { id: itemId });
-        if (res.success) {
-            showToast('Prodotto eliminato', 'success');
-            await loadPantry();
-        } else {
-            showToast(res.message || 'Errore', 'error');
-        }
-    } catch {
-        showToast('Errore di connessione', 'error');
-    }
-}
-
-// ============================================================
-// UTILITY
-// ============================================================
-
-function initSearchBar() {
-    let timeout;
-    document.getElementById('search-input')?.addEventListener('input', () => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => renderCurrentView(), 200);
-    });
-}
-
-function initFilters() {
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentFilter = btn.dataset.filter;
-            renderCurrentView();
-        });
-    });
-}
-
-function populateCategorySelects() {
-    const options = buildCategoryOptions();
-    document.getElementById('edit-category').innerHTML = '<option value="">— seleziona categoria —</option>' + options;
-}
-
-function showLoader(visible) {
-    document.getElementById('list-loader').style.display  = visible ? 'flex'  : 'none';
-    document.getElementById('pantry-grid').style.display  = visible ? 'none'  : (currentView === 'expiry' ? 'grid' : 'none');
-    document.getElementById('category-view').style.display = visible ? 'none' : (currentView === 'category' ? 'block' : 'none');
-}
-
-function setEl(id, value) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = value;
-}
-
-function initLogout() {
-    document.getElementById('btn-logout')?.addEventListener('click', async () => {
-        await api.post('/auth/logout.php');
-        window.location.href = 'index.html';
-    });
 }
